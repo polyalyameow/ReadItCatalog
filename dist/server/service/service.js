@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -17,10 +8,10 @@ const axios_1 = __importDefault(require("axios"));
 const types_1 = require("../types");
 const db_1 = __importDefault(require("../db/db"));
 // Function to fetch book info by ISBN
-const fetchBookInfoByISBN = (isbn) => __awaiter(void 0, void 0, void 0, function* () {
+const fetchBookInfoByISBN = async (isbn) => {
     const url = `https://libris-qa.kb.se/find?q=isbn:${isbn}&@type=Instance`;
     try {
-        const response = yield axios_1.default.get(url, {
+        const response = await axios_1.default.get(url, {
             headers: { Accept: "application/ld+json" },
         });
         if (response.status === 200 &&
@@ -28,8 +19,8 @@ const fetchBookInfoByISBN = (isbn) => __awaiter(void 0, void 0, void 0, function
             response.data.items.length > 0) {
             // console.log(response.data.items[0]);
             // return await parseBookInfo(response.data.items[0], isbn);
-            const bookInfo = yield parseBookInfo(response.data.items[0], isbn);
-            yield saveBookToDatabase(bookInfo);
+            const bookInfo = await parseBookInfo(response.data.items[0], isbn);
+            await saveBookToDatabase(bookInfo);
             return bookInfo;
         }
         else {
@@ -40,19 +31,20 @@ const fetchBookInfoByISBN = (isbn) => __awaiter(void 0, void 0, void 0, function
         console.error("API request failed:", error.message);
         throw new Error("API request failed: " + error.message);
     }
-});
+};
 exports.fetchBookInfoByISBN = fetchBookInfoByISBN;
 // Function to parse the book info
-const parseBookInfo = (data, isbn) => __awaiter(void 0, void 0, void 0, function* () {
+const parseBookInfo = async (data, isbn) => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
     if (!data) {
         throw new Error("Invalid book data received");
     }
+    isbn = isbn.trim();
     const extentLabel = Array.isArray((_b = (_a = data.extent) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.label)
         ? data.extent[0].label[0] || ""
         : ((_d = (_c = data.extent) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.label) || "";
     //   const imageUrl = `https://xinfo.libris.kb.se/xinfo/getxinfo?identifier=/PICTURE/${img_db}/isbn/${isbn}/${isbn}.jpg/orginal`;
-    const imageUrl = yield fetchValidImage(isbn);
+    const imageUrl = await fetchValidImage(isbn);
     // bokrondellen
     const bookInfo = {
         isbn,
@@ -68,7 +60,7 @@ const parseBookInfo = (data, isbn) => __awaiter(void 0, void 0, void 0, function
         tags: extractTags((_v = data.instanceOf) === null || _v === void 0 ? void 0 : _v.subject),
     };
     return types_1.BookInfoSchema.parse(bookInfo);
-});
+};
 function extractYear(year) {
     if (typeof year === "number")
         return year;
@@ -101,14 +93,14 @@ function extractAuthor(contribution) {
         ? `${agent.givenName} ${agent.familyName}`
         : "Unknown Author";
 }
-const fetchValidImage = (isbn) => __awaiter(void 0, void 0, void 0, function* () {
+const fetchValidImage = async (isbn) => {
     const imageSources = ["bokrondellen", "nielsen"];
     const defaultImagePath = "../default/default_book.jpg";
     isbn = isbn.toString().trim();
     for (let img_db of imageSources) {
         const imageUrl = `https://xinfo.libris.kb.se/xinfo/getxinfo?identifier=/PICTURE/${img_db}/isbn/${isbn}/${isbn}.jpg/orginal`;
         try {
-            const response = yield axios_1.default.get(imageUrl, {
+            const response = await axios_1.default.get(imageUrl, {
                 responseType: "arraybuffer",
             });
             console.log(`Checking image from ${img_db} - Status: ${response.status}`);
@@ -142,23 +134,28 @@ const fetchValidImage = (isbn) => __awaiter(void 0, void 0, void 0, function* ()
         }
     }
     return defaultImagePath;
-});
-const saveBookToDatabase = (book) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const saveBookToDatabase = async (book) => {
+    let connection = null;
     try {
+        console.log("🔍 Attempting to get a database connection...");
+        console.log("🔍 Pool Status: ", db_1.default);
+        connection = await db_1.default.getConnection();
+        console.log("✅ Successfully got a connection");
         const query = `
     INSERT INTO books (isbn, title, year, page_count, language, genre, author, image_url, tags)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON DUPLICATE KEY UPDATE 
-      title=VALUES(title), 
-      year=VALUES(year), 
-      page_count=VALUES(page_count), 
-      language=VALUES(language), 
-      genre=VALUES(genre), 
-      author=VALUES(author), 
-      image_url=VALUES(image_url), 
-      tags=VALUES(tags)
-  `;
-        yield db_1.default.execute(query, [
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE 
+        title=VALUES(title), 
+        year=VALUES(year), 
+        page_count=VALUES(page_count), 
+        language=VALUES(language), 
+        genre=VALUES(genre), 
+        author=VALUES(author), 
+        image_url=VALUES(image_url), 
+        tags=VALUES(tags)
+    `;
+        await connection.execute(query, [
             book.isbn,
             book.title,
             book.year,
@@ -174,4 +171,8 @@ const saveBookToDatabase = (book) => __awaiter(void 0, void 0, void 0, function*
     catch (error) {
         console.error("❌ Error saving book:", error.message);
     }
-});
+    finally {
+        if (connection)
+            connection.release();
+    }
+};

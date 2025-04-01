@@ -55,8 +55,9 @@ const parseBookInfo = async (
   isbn = isbn.trim();
 
   const extentLabel = Array.isArray(data.extent?.[0]?.label)
-    ? data.extent[0].label[0] || ""
-    : data.extent?.[0]?.label || "";
+  ? data.extent?.[0]?.label?.[0] || ""
+  : data.extent?.[0]?.label || "";
+
 
   //   const imageUrl = `https://xinfo.libris.kb.se/xinfo/getxinfo?identifier=/PICTURE/${img_db}/isbn/${isbn}/${isbn}.jpg/orginal`;
 
@@ -172,11 +173,11 @@ const fetchValidImage = async (isbn: string): Promise<string> => {
 };
 
 const saveBookToDatabase = async (book: BookInfo) => {
-  let connection: mysql.PoolConnection | null;
+  let connection: mysql.PoolConnection | null = null; 
   try {
     console.log("🔍 Attempting to get a database connection...");
     console.log("🔍 Pool Status: ", pool);
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     console.log("✅ Successfully got a connection");
 
     const query = `

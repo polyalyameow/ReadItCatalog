@@ -13,7 +13,8 @@ export const getBookInfoByISBN = async (
       return res.status(404).json({ error: "Book not found" });
     }
     return res.json(bookInfo);
-  } catch (error) {
-    return res.status(500).json({ error: "Error fetching book information" });
+  } catch (error: any) {
+    console.error("❌ Error fetching book info:", error); // ✅ Log full error
+    return res.status(500).json({ error: error.message ?? "Error fetching book information" });
   }
 };
