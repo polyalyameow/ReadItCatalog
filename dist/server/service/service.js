@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchBookInfoByISBN = void 0;
 const axios_1 = __importDefault(require("axios"));
 const types_1 = require("../types");
+const db_1 = __importDefault(require("../db/db"));
 // Function to fetch book info by ISBN
 const fetchBookInfoByISBN = (isbn) => __awaiter(void 0, void 0, void 0, function* () {
     const url = `https://libris-qa.kb.se/find?q=isbn:${isbn}&@type=Instance`;
@@ -25,8 +26,11 @@ const fetchBookInfoByISBN = (isbn) => __awaiter(void 0, void 0, void 0, function
         if (response.status === 200 &&
             response.data.items &&
             response.data.items.length > 0) {
-            console.log(response.data.items[0]);
-            return yield parseBookInfo(response.data.items[0], isbn);
+            // console.log(response.data.items[0]);
+            // return await parseBookInfo(response.data.items[0], isbn);
+            const bookInfo = yield parseBookInfo(response.data.items[0], isbn);
+            yield saveBookToDatabase(bookInfo);
+            return bookInfo;
         }
         else {
             throw new Error("No book found for the given ISBN");
@@ -51,6 +55,7 @@ const parseBookInfo = (data, isbn) => __awaiter(void 0, void 0, void 0, function
     const imageUrl = yield fetchValidImage(isbn);
     // bokrondellen
     const bookInfo = {
+        isbn,
         imageUrl,
         title: ((_f = (_e = data.hasTitle) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.mainTitle) || "Unknown Title",
         year: extractYear((_h = (_g = data.publication) === null || _g === void 0 ? void 0 : _g[0]) === null || _h === void 0 ? void 0 : _h.year),
@@ -137,4 +142,36 @@ const fetchValidImage = (isbn) => __awaiter(void 0, void 0, void 0, function* ()
         }
     }
     return defaultImagePath;
+});
+const saveBookToDatabase = (book) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const query = `
+    INSERT INTO books (isbn, title, year, page_count, language, genre, author, image_url, tags)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE 
+      title=VALUES(title), 
+      year=VALUES(year), 
+      page_count=VALUES(page_count), 
+      language=VALUES(language), 
+      genre=VALUES(genre), 
+      author=VALUES(author), 
+      image_url=VALUES(image_url), 
+      tags=VALUES(tags)
+  `;
+        yield db_1.default.execute(query, [
+            book.isbn,
+            book.title,
+            book.year,
+            book.pageCount,
+            book.languageCode,
+            book.genre,
+            book.author,
+            book.imageUrl,
+            JSON.stringify(book.tags),
+        ]);
+        console.log(`✅ Book saved: ${book.title}`);
+    }
+    catch (error) {
+        console.error("❌ Error saving book:", error.message);
+    }
 });

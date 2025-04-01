@@ -1,5 +1,7 @@
 import axios from "axios";
 import { BookInfo, BookInfoSchema } from "../types";
+import pool from "../db/db";
+import mysql from "mysql2/promise";
 
 interface LibrisBookResponse {
   hasTitle?: { mainTitle: string }[];
@@ -26,8 +28,13 @@ export const fetchBookInfoByISBN = async (isbn: string): Promise<BookInfo> => {
       response.data.items &&
       response.data.items.length > 0
     ) {
-      console.log(response.data.items[0]);
-      return await parseBookInfo(response.data.items[0], isbn);
+      // console.log(response.data.items[0]);
+      // return await parseBookInfo(response.data.items[0], isbn);
+      const bookInfo = await parseBookInfo(response.data.items[0], isbn);
+
+      await saveBookToDatabase(bookInfo);
+
+      return bookInfo;
     } else {
       throw new Error("No book found for the given ISBN");
     }
@@ -45,6 +52,7 @@ const parseBookInfo = async (
   if (!data) {
     throw new Error("Invalid book data received");
   }
+  isbn = isbn.trim();
 
   const extentLabel = Array.isArray(data.extent?.[0]?.label)
     ? data.extent[0].label[0] || ""
@@ -57,6 +65,7 @@ const parseBookInfo = async (
   // bokrondellen
 
   const bookInfo = {
+    isbn,
     imageUrl,
     title: data.hasTitle?.[0]?.mainTitle || "Unknown Title",
     year: extractYear(data.publication?.[0]?.year),
@@ -160,4 +169,45 @@ const fetchValidImage = async (isbn: string): Promise<string> => {
   }
 
   return defaultImagePath;
+};
+
+const saveBookToDatabase = async (book: BookInfo) => {
+  let connection: mysql.PoolConnection | null;
+  try {
+    console.log("🔍 Attempting to get a database connection...");
+    console.log("🔍 Pool Status: ", pool);
+    const connection = await pool.getConnection();
+    console.log("✅ Successfully got a connection");
+
+    const query = `
+    INSERT INTO books (isbn, title, year, page_count, language, genre, author, image_url, tags)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE 
+        title=VALUES(title), 
+        year=VALUES(year), 
+        page_count=VALUES(page_count), 
+        language=VALUES(language), 
+        genre=VALUES(genre), 
+        author=VALUES(author), 
+        image_url=VALUES(image_url), 
+        tags=VALUES(tags)
+    `;
+
+    await connection.execute(query, [
+      book.isbn,
+      book.title,
+      book.year,
+      book.pageCount,
+      book.languageCode,
+      book.genre,
+      book.author,
+      book.imageUrl,
+      JSON.stringify(book.tags),
+    ]);
+    console.log(`✅ Book saved: ${book.title}`);
+  } catch (error: any) {
+    console.error("❌ Error saving book:", error.message);
+  } finally {
+    if (connection) connection.release();
+  }
 };

@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { fetchBookInfoByISBN } from "../service/service.js";
 
 export const getBookInfoByISBN = async (
