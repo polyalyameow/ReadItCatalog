@@ -1,5 +1,7 @@
+import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+import logger from '../logger';
 
 dotenv.config();
 
@@ -16,13 +18,14 @@ const pool = mysql.createPool({
 
 (async () => {
   try {
-    console.log("🔍 Testing database connection...");
+    logger.debug("Testing database connection...");
     const connection = await pool.getConnection();
-    console.log("✅ Successfully connected to the database!");
+    logger.debug("Successfully connected to the database!");
     connection.release();
   } catch (error: any) {
-    console.error("❌ Database connection failed:", error.message);
+    logger.error("Database connection failed:", error.message);
   }
 })();
 
-export default pool;
+//export default pool;
+export const db = drizzle(pool);

@@ -1,7 +1,11 @@
 import axios from "axios";
 import { BookInfo, BookInfoSchema } from "../types";
-import pool from "../db/db";
+import {db} from "../db/db";
+import { eq } from "drizzle-orm";
+import {books} from "../db/schema"
 import mysql from "mysql2/promise";
+import { createId } from "@paralleldrive/cuid2";
+import logger from "../logger";
 
 interface LibrisBookResponse {
   hasTitle?: { mainTitle: string }[];
@@ -15,7 +19,7 @@ interface LibrisBookResponse {
   };
 }
 
-// Function to fetch book info by ISBN
+
 export const fetchBookInfoByISBN = async (isbn: string): Promise<BookInfo> => {
   const url = `https://libris-qa.kb.se/find?q=isbn:${isbn}&@type=Instance`;
 
@@ -39,7 +43,7 @@ export const fetchBookInfoByISBN = async (isbn: string): Promise<BookInfo> => {
       throw new Error("No book found for the given ISBN");
     }
   } catch (error: any) {
-    console.error("API request failed:", error.message);
+    logger.error("API request failed:", error.message);
     throw new Error("API request failed: " + error.message);
   }
 };
@@ -133,19 +137,15 @@ const fetchValidImage = async (isbn: string): Promise<string> => {
       const response = await axios.get(imageUrl, {
         responseType: "arraybuffer",
       });
-      console.log(`Checking image from ${img_db} - Status: ${response.status}`);
-      console.log("Headers:", response.headers);
+      logger.debug(`Checking image from ${img_db} - Status: ${response.status}`);
+      logger.debug("Headers:", response.headers);
       const contentType = response.headers["content-type"] || "";
       const contentLength =
         parseInt(response.headers["content-length"], 10) || 0;
       const isChunked = response.headers["transfer-encoding"] === "chunked";
       const isValidImage = contentType.startsWith("image/");
 
-      console.log(`Response status: ${response.status}`);
-      console.log(`Response headers:`, response.headers);
-      console.log(
-        `Content-Length: ${contentLength}, Content-Type: ${contentType}`
-      );
+      logger.debug(`Response status: ${response.status}`);
 
       if (response.status === 200 && isValidImage) {
         if (
@@ -153,62 +153,42 @@ const fetchValidImage = async (isbn: string): Promise<string> => {
           response.data.byteLength > 0 ||
           response.data.byteLength > 0
         ) {
-          console.log(`✅ Found valid image from ${img_db}: ${imageUrl}`);
+          logger.debug(`Found valid image from ${img_db}: ${imageUrl}`);
           return imageUrl;
         } else {
-          console.warn(`⚠️ Skipping ${img_db}: Empty image data.`);
+          logger.warn(`Skipping ${img_db}: Empty image data.`);
         }
       } else {
-        console.warn(
-          `⚠️ Skipping ${img_db}: Invalid content type (${contentType}).`
+        logger.warn(
+          `Skipping ${img_db}: Invalid content type (${contentType}).`
         );
       }
     } catch (error: any) {
-      console.warn(`❌ Error fetching image from ${img_db}:`, error.message);
-      if (error.response) console.warn("Response Data:", error.response.data);
+      logger.error(`Error fetching image from ${img_db}:`, error.message);
+      if (error.response) logger.error("Response Data:", error.response.data);
     }
   }
 
   return defaultImagePath;
 };
 
-const saveBookToDatabase = async (book: BookInfo) => {
-  let connection: mysql.PoolConnection | null = null; 
-  try {
-    console.log("🔍 Attempting to get a database connection...");
-    console.log("🔍 Pool Status: ", pool);
-    connection = await pool.getConnection();
-    console.log("✅ Successfully got a connection");
+const saveBookToDatabase = async (book: BookInfo): Promise<void> => {
+  
+  const insertedBook = await db
+  .insert(books)
+  .values({
+    isbn: book.isbn,
+    title: book.title,
+    year: book.year,
+    pageCount: book.pageCount,
+    language: book.languageCode,
+    genre: book.genre,
+    author: book.author,
+    imageUrl: book.imageUrl,
+    tags: book.tags,
+  }).$returningId();
 
-    const query = `
-    INSERT INTO books (isbn, title, year, page_count, language, genre, author, image_url, tags)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE 
-        title=VALUES(title), 
-        year=VALUES(year), 
-        page_count=VALUES(page_count), 
-        language=VALUES(language), 
-        genre=VALUES(genre), 
-        author=VALUES(author), 
-        image_url=VALUES(image_url), 
-        tags=VALUES(tags)
-    `;
-
-    await connection.execute(query, [
-      book.isbn,
-      book.title,
-      book.year,
-      book.pageCount,
-      book.languageCode,
-      book.genre,
-      book.author,
-      book.imageUrl,
-      JSON.stringify(book.tags),
-    ]);
-    console.log(`✅ Book saved: ${book.title}`);
-  } catch (error: any) {
-    console.error("❌ Error saving book:", error.message);
-  } finally {
-    if (connection) connection.release();
+  if (!insertedBook) {
+    throw new Error("Error saving book.");
   }
 };
