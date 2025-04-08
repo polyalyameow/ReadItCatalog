@@ -1,6 +1,4 @@
-import { mysqlTable, varchar, int, json } from "drizzle-orm/mysql-core";
-import { sql } from "drizzle-orm";
-import { createId } from '@paralleldrive/cuid2';
+import { mysqlTable, varchar, int, json, primaryKey } from "drizzle-orm/mysql-core";
 
 const defaultImage = './img/default_book.jpg'
 
@@ -15,3 +13,18 @@ export const books = mysqlTable("books", {
     imageUrl: varchar("image_url", { length: 500 }).default(defaultImage),
     tags: json("tags").$type<string[]>(),
 });
+
+export const userBooks = mysqlTable("user_books", {
+    userId: varchar("user_id", { length: 256 }).notNull(),
+    isbn: varchar("isbn", { length: 13 }).notNull(),
+    addedAt: int("added_at").notNull(),
+  }, (table) => [
+    primaryKey({columns: [table.userId, table.isbn]})
+  ]);
+  
+export const users = mysqlTable("users", {
+    id: varchar("id", { length: 255 }).notNull().primaryKey(),
+    username: varchar("username", { length: 255 }).notNull(),
+    hash: varchar("hash", { length: 255 }).notNull(),
+    salt: varchar("salt", { length: 255 }).notNull(),
+  });

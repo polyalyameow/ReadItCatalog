@@ -1,8 +1,8 @@
 import axios from "axios";
-import { BookInfo, BookInfoSchema } from "../types";
-import {db} from "../db/db";
+import { BookInfo, BookInfoSchema } from "../../types/types";
+import {db} from "../config/db";
 import { eq } from "drizzle-orm";
-import {books} from "../db/schema"
+import {books, userBooks} from "../db/schema"
 import mysql from "mysql2/promise";
 import { createId } from "@paralleldrive/cuid2";
 import logger from "../logger";
@@ -172,23 +172,39 @@ const fetchValidImage = async (isbn: string): Promise<string> => {
   return defaultImagePath;
 };
 
-const saveBookToDatabase = async (book: BookInfo): Promise<void> => {
-  
-  const insertedBook = await db
-  .insert(books)
-  .values({
-    isbn: book.isbn,
-    title: book.title,
-    year: book.year,
-    pageCount: book.pageCount,
-    language: book.languageCode,
-    genre: book.genre,
-    author: book.author,
-    imageUrl: book.imageUrl,
-    tags: book.tags,
-  }).$returningId();
+const saveBookToDatabase = async (book: BookInfo, userId: string): Promise<void> => {
+  try {
+    await db.transaction(async (tx) => {
+      const existingBook = await tx
+        .select()
+        .from(books)
+        .where(eq(books.isbn, book.isbn))
+        .limit(1)
+        .execute();
 
-  if (!insertedBook) {
+      if (existingBook.length === 0) {
+        await tx.insert(books)
+          .values({
+            isbn: book.isbn,
+            title: book.title,
+            year: book.year,
+            pageCount: book.pageCount,
+            language: book.languageCode,
+            genre: book.genre,
+            author: book.author,
+            imageUrl: book.imageUrl,
+            tags: book.tags,
+          })
+          .$returningId();
+      }
+
+      await tx.insert(userBooks).values({
+        userId: userId,
+        isbn: book.isbn,
+        addedAt: Math.floor(Date.now() / 1000),
+      });
+    });
+  } catch (error) {
     throw new Error("Error saving book.");
   }
 };

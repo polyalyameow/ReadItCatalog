@@ -1,0 +1,8 @@
+import express, { Router } from "express";
+import { getUserSavedBooksController } from "../controller/user";
+
+const router: Router = express.Router();
+
+router.get("/my-books", getUserSavedBooksController as unknown as express.RequestHandler);
+
+export default router;

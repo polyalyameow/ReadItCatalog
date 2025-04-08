@@ -33,3 +33,19 @@ export const BookFeedbackSchema = z.object({
 });
 
 export type BookFeedback = z.infer<typeof BookFeedbackSchema>;
+
+export const UserRegistrationSchema = z.object({
+  email: z.string().email(),
+  username: z.string().min(3),
+  password: z.string().min(6),
+  confirmPassword: z.string().min(6),
+});
+
+export type UserRegistration = z.infer<typeof UserRegistrationSchema>;
+
+export const UserLoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+export type UserLogin = z.infer<typeof UserLoginSchema>;
