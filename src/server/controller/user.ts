@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserSavedBooks, loginUser, registerUser } from "../service/user";
+import { getUserSavedBooks, loginUser, logoutUser, registerUser } from "../service/user";
 import { UserLoginSchema, UserRegistrationSchema, UserLogin, UserRegistration } from "../../types/types";
 import logger from "../logger";
 import { AuthRequest } from "../middleware/verifyJwt";
@@ -67,4 +67,20 @@ export const loginUserController = async (req: Request, res: Response): Promise<
     });
   }
 
+};
+
+export const logoutUserController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      res.status(400).json({ message: "No token provided" });
+      return;
+    }
+
+    await logoutUser(token); 
+
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error: any) {
+    res.status(500).json({ message: "Logout failed", error });
+  }
 };

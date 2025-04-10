@@ -37,3 +37,8 @@ export const users = mysqlTable("users", {
   username: varchar("username", { length: 255 }).notNull(),
   password: varchar("password", { length: 255 }).notNull(),
 });
+
+export const jwtBlacklist = mysqlTable("jwt_blacklist", {
+  token: varchar("token", { length: 500 }).primaryKey(),
+  createdAt: int("created_at").notNull(),
+});

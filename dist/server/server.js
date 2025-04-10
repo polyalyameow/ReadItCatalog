@@ -9,8 +9,6 @@ const logger_1 = __importDefault(require("./logger"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const user_1 = __importDefault(require("./routes/user"));
 const verifyJwt_1 = require("./middleware/verifyJwt");
-const config_1 = require("./config/config");
-console.log('JWT_SECRET loaded:', config_1.JWT_SECRET);
 const app = (0, express_1.default)();
 const port = 8080;
 app.use(express_1.default.json());

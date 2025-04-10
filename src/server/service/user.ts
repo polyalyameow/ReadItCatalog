@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../config/db";
-import { userBooks, books, users, userBookFeedback } from "../db/schema";
+import { userBooks, books, users, userBookFeedback, jwtBlacklist } from "../db/schema";
 import bcrypt from 'bcryptjs';
 import { generateJWT } from "../utils/jwtUtils";
 import { v4 as uuidv4 } from 'uuid';
@@ -102,4 +102,11 @@ export const loginUser = async ({ email, password }: UserLogin) => {
       username: foundUser.username,
     },
   };
+};
+
+export const logoutUser = async (token: string) => {
+  await db.insert(jwtBlacklist).values({
+    token,
+    createdAt: Date.now(),
+  });
 };

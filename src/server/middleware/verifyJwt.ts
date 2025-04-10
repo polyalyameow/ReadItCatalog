@@ -1,13 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { db } from '../config/db';
-import { users } from '../db/schema';
+import { jwtBlacklist, users } from '../db/schema';
 import { eq } from "drizzle-orm";
-import { User } from '../../types/types';
 
 export interface AuthRequest<P = any> extends Request<P> {
   currentUser?: { id: string };
 }
+
+const isTokenBlacklisted = async (token: string) => {
+  const blacklistedToken = await db.select().from(jwtBlacklist).where(eq(jwtBlacklist.token, token)).limit(1).execute();
+  return blacklistedToken.length > 0;
+};
 
 
 export const verifyToken = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -22,7 +26,12 @@ export const verifyToken = async (req: AuthRequest, res: Response, next: NextFun
   
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
-        
+      
+      if (await isTokenBlacklisted(token)) {
+        res.status(401).json({ message: "Token is invalid or has been logged out" });
+        return;
+      }  
+
       const userId = String(decoded.userId); 
       const user = await db.select().from(users).where(eq(users.id, userId)).limit(1).execute();
   
