@@ -1,10 +1,5 @@
-export interface User {
-    id: string;
-    username: string;
-    hash: string;
-    salt: string;
-  }
-  
+import { User } from "./types";
+
 
 declare global {
   namespace Express {

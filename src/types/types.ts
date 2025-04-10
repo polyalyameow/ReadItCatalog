@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const BookInfoSchema = z.object({
-  id: z.string().uuid().optional(),
   isbn: z.string(),
   imageUrl: z.string(),
   title: z.string(),
@@ -22,12 +21,17 @@ export const BookInfoSchema = z.object({
 export type BookInfo = z.infer<typeof BookInfoSchema>;
 
 export const BookFeedbackSchema = z.object({
-  month: z.string().optional(),
-  type: z.string().optional(),
+  month_of_reading: z
+  .enum([
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ])
+  .optional(),
+  year_of_reading: z.string().optional(),
   rating: z
     .number()
     .min(1)
-    .max(5, "Betyget kan vara mellan 1 och 5 stjärnor")
+    .max(5, "The rating can be between 1 and 5 stars.")
     .optional(),
   comment: z.string().optional(),
 });
@@ -49,3 +53,13 @@ export const UserLoginSchema = z.object({
 });
 
 export type UserLogin = z.infer<typeof UserLoginSchema>;
+
+export const UserSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  username: z.string().min(3),
+  password: z.string().min(6),
+  confirmPassword: z.string().min(6),
+});
+
+export type User= z.infer<typeof UserSchema>;

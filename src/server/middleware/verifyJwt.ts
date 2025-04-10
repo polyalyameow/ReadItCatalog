@@ -3,35 +3,38 @@ import jwt from 'jsonwebtoken';
 import { db } from '../config/db';
 import { users } from '../db/schema';
 import { eq } from "drizzle-orm";
+import { User } from '../../types/types';
 
-interface User {
-    id: string;
-    username: string;
-    hash: string;
-    salt: string;
-  }
+export interface AuthRequest<P = any> extends Request<P> {
+  currentUser?: { id: string };
+}
 
-export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers['authorization']?.split(' ')[1]; // Assuming Bearer token in the Authorization header
+
+export const verifyToken = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  console.log(`[verifyToken] Incoming path: ${req.path}`);  
+  const token = req.headers['authorization']?.split(' ')[1];
+    console.log(req.headers);
   
     if (!token) {
-      return res.status(403).json({ message: 'Token is required' });
+      res.status(403).json({ message: 'Token is required' });
+      return;
     }
   
     try {
-      const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
         
       const userId = String(decoded.userId); 
       const user = await db.select().from(users).where(eq(users.id, userId)).limit(1).execute();
   
       if (!user.length) {
-        return res.status(401).json({ message: 'User not found' });
+        res.status(401).json({ message: 'User not found' });
+        return;
       }
   
-      req.user = user[0] as User;
+      req.currentUser = { id: user[0].id };
       next();
     } catch (err) {
       console.error(err);
-      return res.status(401).json({ message: 'Invalid token' });
+      res.status(401).json({ message: 'Invalid token' });
     }
   };

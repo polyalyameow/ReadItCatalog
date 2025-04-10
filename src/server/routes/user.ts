@@ -3,6 +3,6 @@ import { getUserSavedBooksController } from "../controller/user";
 
 const router: Router = express.Router();
 
-router.get("/my-books", getUserSavedBooksController as unknown as express.RequestHandler);
+router.get("/my-books", getUserSavedBooksController);
 
 export default router;

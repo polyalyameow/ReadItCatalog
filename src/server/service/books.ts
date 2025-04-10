@@ -2,9 +2,7 @@ import axios from "axios";
 import { BookInfo, BookInfoSchema } from "../../types/types";
 import {db} from "../config/db";
 import { eq } from "drizzle-orm";
-import {books, userBooks} from "../db/schema"
-import mysql from "mysql2/promise";
-import { createId } from "@paralleldrive/cuid2";
+import {books, userBookFeedback, userBooks} from "../db/schema"
 import logger from "../logger";
 
 interface LibrisBookResponse {
@@ -20,7 +18,10 @@ interface LibrisBookResponse {
 }
 
 
-export const fetchBookInfoByISBN = async (isbn: string): Promise<BookInfo> => {
+export const fetchBookInfoByISBN = async (isbn: string, userId: string): Promise<BookInfo> => {
+  isbn = isbn.replace(/[^0-9]/g, "");
+  isbn = isbn.trim();
+
   const url = `https://libris-qa.kb.se/find?q=isbn:${isbn}&@type=Instance`;
 
   try {
@@ -32,11 +33,10 @@ export const fetchBookInfoByISBN = async (isbn: string): Promise<BookInfo> => {
       response.data.items &&
       response.data.items.length > 0
     ) {
-      // console.log(response.data.items[0]);
-      // return await parseBookInfo(response.data.items[0], isbn);
+
       const bookInfo = await parseBookInfo(response.data.items[0], isbn);
 
-      await saveBookToDatabase(bookInfo);
+      await saveBookToDatabase(bookInfo, userId);
 
       return bookInfo;
     } else {
@@ -56,7 +56,6 @@ const parseBookInfo = async (
   if (!data) {
     throw new Error("Invalid book data received");
   }
-  isbn = isbn.trim();
 
   const extentLabel = Array.isArray(data.extent?.[0]?.label)
   ? data.extent?.[0]?.label?.[0] || ""
@@ -96,7 +95,6 @@ function extractYear(year: number | string | undefined): number {
   return 0;
 }
 
-// Helper function to extract the page count from the extent label
 function extractPageCount(extentLabel: string): number {
   if (typeof extentLabel !== "string") return 0;
   const match = extentLabel.match(/\d+/);
@@ -198,11 +196,23 @@ const saveBookToDatabase = async (book: BookInfo, userId: string): Promise<void>
           .$returningId();
       }
 
-      await tx.insert(userBooks).values({
+      const userBookInsertResult = await tx.insert(userBooks).values({
         userId: userId,
         isbn: book.isbn,
         addedAt: Math.floor(Date.now() / 1000),
-      });
+      })
+      .$returningId();
+
+      const userBookId = userBookInsertResult[0].id;
+
+      await tx.insert(userBookFeedback)
+      .values({
+          userBookId,
+          rating: 0,
+          comment: '',
+          yearOfReading: 0,
+          monthOfReading: '',
+        }).execute();
     });
   } catch (error) {
     throw new Error("Error saving book.");

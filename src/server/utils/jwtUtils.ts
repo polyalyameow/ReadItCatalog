@@ -1,6 +1,8 @@
 import jwt, { SignOptions } from "jsonwebtoken";
+import { JWT_SECRET } from "../config/config";
 
-const generateJWT = (userId: string) => {
+
+export const generateJWT = (userId: string) => {
     const payload = {
       userId,
     };
@@ -9,6 +11,6 @@ const generateJWT = (userId: string) => {
       expiresIn: '1h',
     };
   
-    return jwt.sign(payload, process.env.JWT_SECRET!, options);
+    return jwt.sign(payload, JWT_SECRET, options);
   };
   
