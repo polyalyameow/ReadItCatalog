@@ -1,8 +1,8 @@
 import axios from "axios";
 import { BookInfo, BookInfoSchema } from "../../types/types";
-import {db} from "../config/db";
+import { db } from "../config/db";
 import { eq } from "drizzle-orm";
-import {books, userBookFeedback, userBooks} from "../db/schema"
+import { books, userBookFeedback, userBooks } from "../db/schema"
 import logger from "../logger";
 
 interface LibrisBookResponse {
@@ -58,8 +58,8 @@ const parseBookInfo = async (
   }
 
   const extentLabel = Array.isArray(data.extent?.[0]?.label)
-  ? data.extent?.[0]?.label?.[0] || ""
-  : data.extent?.[0]?.label || "";
+    ? data.extent?.[0]?.label?.[0] || ""
+    : data.extent?.[0]?.label || "";
 
 
   //   const imageUrl = `https://xinfo.libris.kb.se/xinfo/getxinfo?identifier=/PICTURE/${img_db}/isbn/${isbn}/${isbn}.jpg/orginal`;
@@ -70,10 +70,10 @@ const parseBookInfo = async (
 
   const bookInfo = {
     isbn,
-    imageUrl,
+    image_url: imageUrl,
     title: data.hasTitle?.[0]?.mainTitle || "Unknown Title",
     year: extractYear(data.publication?.[0]?.year),
-    pageCount: extractPageCount(extentLabel),
+    page_count: extractPageCount(extentLabel),
     languageCode: data.instanceOf?.language?.[0]?.code || "Unknown",
     genre:
       data.instanceOf?.genreForm?.[0]?.prefLabelByLang?.sv ||
@@ -104,8 +104,8 @@ function extractPageCount(extentLabel: string): number {
 function extractTags(subject?: { prefLabel?: string }[]): string[] {
   return subject
     ? subject
-        .map((s) => s.prefLabel ?? "Unknown")
-        .filter((tag): tag is string => Boolean(tag))
+      .map((s) => s.prefLabel ?? "Unknown")
+      .filter((tag): tag is string => Boolean(tag))
     : ["Unknown"];
 }
 
@@ -126,7 +126,6 @@ function extractAuthor(
 const fetchValidImage = async (isbn: string): Promise<string> => {
   const imageSources = ["bokrondellen", "nielsen"];
   const defaultImagePath = "../default/default_book.jpg";
-  isbn = isbn.toString().trim();
 
   for (let img_db of imageSources) {
     const imageUrl = `https://xinfo.libris.kb.se/xinfo/getxinfo?identifier=/PICTURE/${img_db}/isbn/${isbn}/${isbn}.jpg/orginal`;
@@ -186,32 +185,32 @@ const saveBookToDatabase = async (book: BookInfo, userId: string): Promise<void>
             isbn: book.isbn,
             title: book.title,
             year: book.year,
-            pageCount: book.pageCount,
-            language: book.languageCode,
+            page_count: book.page_count,
+            language: book.language,
             genre: book.genre,
             author: book.author,
-            imageUrl: book.imageUrl,
+            image_url: book.image_url,
             tags: book.tags,
           })
           .$returningId();
       }
 
       const userBookInsertResult = await tx.insert(userBooks).values({
-        userId: userId,
+        user_id: userId,
         isbn: book.isbn,
-        addedAt: Math.floor(Date.now() / 1000),
+        added_at: Math.floor(Date.now() / 1000),
       })
-      .$returningId();
+        .$returningId();
 
       const userBookId = userBookInsertResult[0].id;
 
       await tx.insert(userBookFeedback)
-      .values({
-          userBookId,
+        .values({
+          user_book_id: userBookId,
           rating: 0,
           comment: '',
-          yearOfReading: 0,
-          monthOfReading: '',
+          year_of_reading: 0,
+          month_of_reading: '',
         }).execute();
     });
   } catch (error) {

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const BookInfoSchema = z.object({
   isbn: z.string(),
-  imageUrl: z.string(),
+  image_url: z.string(),
   title: z.string(),
   year: z.preprocess((val) => {
     if (typeof val === "string") {
@@ -11,8 +11,8 @@ export const BookInfoSchema = z.object({
     }
     return val;
   }, z.number().optional()),
-  pageCount: z.number().optional(),
-  languageCode: z.string().optional(),
+  page_count: z.number().optional(),
+  language: z.string().optional(),
   genre: z.string().optional(),
   author: z.string().optional(),
   tags: z.array(z.string()).optional(),
@@ -22,19 +22,20 @@ export type BookInfo = z.infer<typeof BookInfoSchema>;
 
 export const BookFeedbackSchema = z.object({
   month_of_reading: z
-  .enum([
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ])
-  .optional(),
-  year_of_reading: z.string().optional(),
+    .enum([
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ]).nullable()
+    .optional(),
+  year_of_reading: z.number().nullable().optional(),
   rating: z
     .number()
     .min(1)
     .max(5, "The rating can be between 1 and 5 stars.")
+    .nullable()
     .optional(),
-  comment: z.string().optional(),
-});
+  comment: z.string().max(1000, "Comment can be max 1000 characters long.").nullable().optional(),
+}).strict();;
 
 export type BookFeedback = z.infer<typeof BookFeedbackSchema>;
 
@@ -42,7 +43,7 @@ export const UserRegistrationSchema = z.object({
   email: z.string().email(),
   username: z.string().min(3),
   password: z.string().min(6),
-  confirmPassword: z.string().min(6),
+  confirm_password: z.string().min(6),
 });
 
 export type UserRegistration = z.infer<typeof UserRegistrationSchema>;
@@ -62,4 +63,4 @@ export const UserSchema = z.object({
   confirmPassword: z.string().min(6),
 });
 
-export type User= z.infer<typeof UserSchema>;
+export type User = z.infer<typeof UserSchema>;
