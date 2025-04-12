@@ -7,40 +7,39 @@ import { v4 as uuidv4 } from 'uuid';
 import { BookFeedback, UserLogin, UserRegistration } from "../../types/types";
 
 export const getUserSavedBooks = async (userId: string) => {
-  const savedBooks = await db.transaction(async (tx) => {
-    tx.select({
-      user_book_id: userBooks.id,
-      isbn: books.isbn,
-      title: books.title,
-      year: books.year,
-      page_count: books.page_count,
-      language: books.language,
-      genre: books.genre,
-      author: books.author,
-      image_url: books.image_url,
-      tags: books.tags,
-      rating: userBookFeedback.rating,
-      comment: userBookFeedback.comment,
-      year_of_reading: userBookFeedback.year_of_reading,
-      month_of_reading: userBookFeedback.month_of_reading,
-    })
-      .from(userBooks)
-      .innerJoin(books, eq(userBooks.isbn, books.isbn))
-      .innerJoin(userBookFeedback, eq(userBooks.id, userBookFeedback.user_book_id))
-      .where(eq(userBooks.user_id, userId))
-      .execute();
+  console.log(`[getUserSavedBooks] Fetching books for userId: ${userId}`);
+  
+  const result = await db.select({
+    user_book_id: userBooks.id,
+    isbn: books.isbn,
+    title: books.title,
+    year: books.year,
+    page_count: books.page_count,
+    language: books.language,
+    genre: books.genre,
+    author: books.author,
+    image_url: books.image_url,
+    tags: books.tags,
+    rating: userBookFeedback.rating,
+    comment: userBookFeedback.comment,
+    year_of_reading: userBookFeedback.year_of_reading,
+    month_of_reading: userBookFeedback.month_of_reading,
   })
+    .from(userBooks)
+    .innerJoin(books, eq(userBooks.isbn, books.isbn))
+    .innerJoin(userBookFeedback, eq(userBooks.id, userBookFeedback.user_book_id))
+    .where(eq(userBooks.user_id, userId))
+    .execute();
 
-  return savedBooks;
+  console.log(`[getUserSavedBooks] Query Result:`, result);
+  return result;
 };
 
 export const patchBookFeedbackByUserBookId = async (userBookId: number, data: Partial<BookFeedback>) => {
-  await db.transaction(async (tx) => {
-    tx.update(userBookFeedback)
-      .set(data)
-      .where(eq(userBookFeedback.user_book_id, userBookId))
-      .execute();
-  })
+  await db.update(userBookFeedback)
+    .set(data)
+    .where(eq(userBookFeedback.user_book_id, userBookId))
+    .execute();
 };
 
 export const deleteUserBook = async (userId: string, userBookId: number): Promise<boolean> => {
@@ -131,7 +130,7 @@ export const loginUser = async ({ email, password }: UserLogin) => {
 
     const foundUser = user[0];
 
-    const isPasswordValid = bcrypt.compareSync(password, foundUser.password);
+    const isPasswordValid = await bcrypt.compareSync(password, foundUser.password);
     if (!isPasswordValid) {
       throw new Error("Invalid email or password");
     }
@@ -152,7 +151,7 @@ export const loginUser = async ({ email, password }: UserLogin) => {
 
 export const logoutUser = async (token: string) => {
   await db.transaction(async (tx) => {
-    tx.insert(jwtBlacklist).values({
+    await tx.insert(jwtBlacklist).values({
       token,
       created_at: Date.now(),
     });
