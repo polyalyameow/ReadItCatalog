@@ -1,6 +1,4 @@
-import { sql } from "drizzle-orm";
-import { mysqlTable, varchar, int, json, primaryKey, foreignKey } from "drizzle-orm/mysql-core";
-import { unknown } from "zod";
+import { mysqlTable, varchar, int, json } from "drizzle-orm/mysql-core";
 
 const defaultImage = './img/default_book.jpg'
 

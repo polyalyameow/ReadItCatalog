@@ -39,12 +39,20 @@ export const BookFeedbackSchema = z.object({
 
 export type BookFeedback = z.infer<typeof BookFeedbackSchema>;
 
-export const UserRegistrationSchema = z.object({
-  email: z.string().email(),
-  username: z.string().min(3),
-  password: z.string().min(6),
-  confirm_password: z.string().min(6),
-});
+const BookRowSchema = BookInfoSchema.merge(BookFeedbackSchema);
+export type BookRow = z.infer<typeof BookRowSchema>;
+
+export const UserRegistrationSchema = z
+  .object({
+    email: z.string().email({ message: "Invalid email format" }),
+    username: z.string().min(3, { message: "Username must be at least 3 characters" }),
+    password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+    confirm_password: z.string().min(6, { message: "Confirm password must be at least 6 characters" }),
+  })
+  .refine((data) => data.password === data.confirm_password, {
+    message: "Passwords do not match",
+    path: ["confirm_password"],
+  });
 
 export type UserRegistration = z.infer<typeof UserRegistrationSchema>;
 
