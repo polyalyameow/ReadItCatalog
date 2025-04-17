@@ -39,8 +39,19 @@ export const BookFeedbackSchema = z.object({
 
 export type BookFeedback = z.infer<typeof BookFeedbackSchema>;
 
-const BookRowSchema = BookInfoSchema.merge(BookFeedbackSchema);
+const BookRowSchema = BookInfoSchema.merge(BookFeedbackSchema)
+
 export type BookRow = z.infer<typeof BookRowSchema>;
+
+export const UserIdSchema = z.object({
+  user_book_id: z.string()
+});
+
+export type UserId = z.infer<typeof UserIdSchema>;
+
+const UserAndBookRowSchema = BookRowSchema.merge(UserIdSchema);
+
+export type UserAndBookRow = z.infer<typeof UserAndBookRowSchema>;
 
 export const UserRegistrationSchema = z
   .object({

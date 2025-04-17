@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { BookFeedback, UserLogin, UserRegistration } from "../../types/types";
 
 export const getUserSavedBooks = async (userId: string) => {
-  console.log(`[getUserSavedBooks] Fetching books for userId: ${userId}`);
   
   const result = await db.select({
     user_book_id: userBooks.id,
@@ -31,7 +30,6 @@ export const getUserSavedBooks = async (userId: string) => {
     .where(eq(userBooks.user_id, userId))
     .execute();
 
-  console.log(`[getUserSavedBooks] Query Result:`, result);
   return result;
 };
 

@@ -1,9 +1,9 @@
 import { z } from "zod";
 import axiosInstance from "./axiosInstance";
 
-export const getUsersBooks = async () => {
+export const getUserBooks = async () => {
   try {
-    const response = await axiosInstance.get("/my-books");
+    const response = await axiosInstance.get("/user/my-books");
     return response.data;
   } catch (error: unknown) {
           if (error instanceof z.ZodError) {

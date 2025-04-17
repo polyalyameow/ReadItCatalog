@@ -44,7 +44,6 @@ import stats from "./routes/stats";
 import { verifyToken } from "./middleware/verifyJwt";
 import logger from "./logger";
 import { loginUserController, logoutUserController, registerUserController } from "./controller/user";
-import { logoutUser } from "./service/user";
 
 // Create an express app instance
 const app = express();
