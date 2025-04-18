@@ -2,15 +2,18 @@
   "compilerOptions": {
     "target": "ES2017",                                 
     "module": "commonjs",                              
-    "rootDir": "src",
+    "rootDir": ".",
     "moduleResolution": "Node",                   
-    "outDir": "dist",
+    "outDir": "./server/dist",
     "esModuleInterop": true,                             
     "forceConsistentCasingInFileNames": true,            
     "strict": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,                         
   },
-"include": ["src/server"],
+  "include": [
+    "server/**/*",
+    "shared/types/**/*"
+  ],
   "exclude": ["node_modules"]
 }
