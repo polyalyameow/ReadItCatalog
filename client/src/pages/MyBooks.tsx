@@ -1,4 +1,4 @@
-import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Select, createListCollection } from '@chakra-ui/react'
+import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Textarea, Dialog, CloseButton, Portal } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { deleteUserBook, getUserBooks, patchUserBook } from '../api/user'
 import { BookFeedbackSchema, UserAndBookRow } from '../../../shared/types/types'
@@ -13,7 +13,9 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
   const [error, setError] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<{ [key: string]: Partial<UserAndBookRow> }>({});
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
-  const [focusedRowId, setFocusedRowId] = useState<string | null>(null); 
+  const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
+  const [opened, setOpened] = useState<boolean>(false); 
+  
 
 
    useEffect(() => {
@@ -27,29 +29,17 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
         setLoading(false);
       }
     };
-  
+
     fetchBooks();
   }, [bookUpdateKey]);
 
   const toggleEditMode = (userBookId: string) => {
     setEditingRowId((prev) => (prev === userBookId ? null : userBookId));
   };
-  
-  const YearSchema = z.number().min(1000).max(9999, { message: 'Invalid year' });
-  const monthEnum = BookFeedbackSchema.shape.month_of_reading.unwrap().unwrap();
-  const monthOptions = (monthEnum as z.ZodEnum<[string, ...string[]]>).options;
-
-  const months = createListCollection({
-    items: monthOptions.map((month) => ({
-      label: month,
-      value: month,
-    })),
-  });  
-
 
   const trimTags = (tags?: string[] | string): string => {
     let tagArray: string[] = [];
-  
+
     if (typeof tags === 'string') {
       try {
         const parsed = JSON.parse(tags);
@@ -64,7 +54,7 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
     } else {
       return '🤷‍♀️ No tags';
     }
-  
+
     const filtered = [...new Set (tagArray.filter(tag => tag && tag !== 'Unknown'))];
     return filtered.length > 0 ? filtered.join(', ') : '🤷‍♀️ No tags';
   };
@@ -77,11 +67,12 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
       return '⭐'.repeat(rating);
     }
   }
-  
+
   const deleteBook = async (id: string) => {
     try {
       await deleteUserBook(id)
       setUserBooks(prevBooks => prevBooks.filter(book => book.user_book_id !== id));
+      setOpened(false);
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message || "Failed to delete a book");
@@ -99,7 +90,7 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
       [id]: { ...prev[id], [field]: value }
     }));
   };
-  
+
   const handleKeyPress = async (e: React.KeyboardEvent, id: string) => {
     if (e.key === 'Enter') {
       const data = editingValues[id];
@@ -129,23 +120,51 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
         } catch (err) {
           console.error('Failed to patch:', err);
         }
-      
+
     }
   };
 
   const rows = userBooks.length > 0 ? userBooks.map((item, index) => {
-    const selectedMonth =
-    editingValues[item.user_book_id]?.month_of_reading ?? item.month_of_reading;
 
-  const value = typeof selectedMonth === "string" ? [selectedMonth] : [];
     return (
     <Table.Row key={index} >
       <Table.Cell>
         <VStack gap={10} mr={4}>
           <Box boxSize="4">
+          <Dialog.Root>
+      <Dialog.Trigger asChild>
+        <Button variant="outline" size="sm" onClick={() => setOpened(true)}>
+        <TrashIcon />
+        </Button>
+      </Dialog.Trigger>
+      {opened && 
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header>
+              <Dialog.Title>Are you sure that you want to delete this book?</Dialog.Title>
+            </Dialog.Header>
+            <Dialog.Body>
+              <p>
+              This action cannot be undone. The book and all related data will be permanently deleted.
+              </p>
+            </Dialog.Body>
+            <Dialog.Footer>
+              <Dialog.ActionTrigger asChild>
+                <Button variant="outline" onClick={() => setOpened(false)}>Cancel</Button>
+              </Dialog.ActionTrigger>
+              <Button onClick={() => deleteBook(item.user_book_id)}>Delete</Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+      }
+    </Dialog.Root>
+{/* 
           <Button variant="outline" size="sm" onClick={() => deleteBook(item.user_book_id)}>
             <TrashIcon />
-          </Button>
+          </Button> */}
           </Box>
           <Box boxSize="4">
           <Button variant="outline" size="sm" onClick={() => toggleEditMode(item.user_book_id)}>
@@ -216,7 +235,6 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
   {editingRowId === item.user_book_id ? (
      <Input
      size="lg"
-     
      placeholder="Choose month"
      value={editingValues[item.user_book_id]?.month_of_reading ?? item.month_of_reading ?? ""}
      onChange={(e) => handleEditChange(item.user_book_id, 'month_of_reading', (String(e.target.value).charAt(0).toUpperCase() + String(e.target.value).slice(1).trim())
@@ -255,16 +273,32 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
           )}
     </Table.Cell>
       {/* <Table.Cell>{item.comment}</Table.Cell> */}
-      <Table.Cell>
+      <Table.Cell maxWidth="100px">
       {editingRowId === item.user_book_id ? (
-      <Input
-        size="sm"
-        maxW={64}
-        placeholder="Write comment..."
+         <Box position="relative">
+        <Textarea placeholder="Comment can be max 1000 characters long."
+        size="md"
+        h={100}
         value={editingValues[item.user_book_id]?.comment ?? item.comment ?? ''}
-        onChange={(e) => handleEditChange(item.user_book_id, 'comment', e.target.value)}
-        onKeyDown={(e) => handleKeyPress(e, item.user_book_id)}
-      />) : (
+        onChange={(e) => handleEditChange(item.user_book_id, 'comment', String(e.target.value))}
+            onKeyDown={(e) => handleKeyPress(e, item.user_book_id)}
+            onFocus={() => setFocusedRowId(item.user_book_id)}
+            onBlur={() => setFocusedRowId(null)}
+            style={{
+              border: focusedRowId === item.user_book_id ? '2px solid #3182ce' : '1px solid #e2e8f0',
+              boxShadow: focusedRowId === item.user_book_id ? '0 0 10px rgba(49, 130, 206, 0.5)' : 'none',
+            }}/>
+            <Text
+            fontSize="xs"
+            color="gray.500"
+            position="absolute"
+            bottom="4px"
+            right="8px"
+          >
+            {(editingValues[item.user_book_id]?.comment?.length ?? item.comment?.length ?? 0)} / 1000
+          </Text>
+      </Box>
+          ) : (
         item.comment
       )}
     </Table.Cell>
