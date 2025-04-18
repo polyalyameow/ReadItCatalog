@@ -23,6 +23,7 @@ const MainPage = () => {
         setError(firstError);
         return;
       }
+      
       try {
           await getBooks(value);
           //await new Promise(res => setTimeout(res, 500));

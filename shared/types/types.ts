@@ -35,7 +35,7 @@ export const BookFeedbackSchema = z.object({
       "July", "August", "September", "October", "November", "December"
     ]).nullable()
     .optional(),
-  year_of_reading: z.number().nullable().optional(),
+  year_of_reading: z.number().min(1000).max(9999, { message: 'Invalid year' }).nullable().optional(),
   rating: z
     .number()
     .min(1)

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import axiosInstance from "./axiosInstance";
+import { UserAndBookRow } from "../../../shared/types/types";
 
 export const getUserBooks = async () => {
   try {
@@ -26,3 +27,16 @@ export const deleteUserBook = async (id: string) => {
     }
 }
 };
+
+export const patchUserBook = async (id: string, data: Partial<UserAndBookRow>) => {
+  try {
+    const response = await axiosInstance.patch(`/user/my-books/${id}/feedback`, data)
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+        throw new Error(error.message);
+    } else {
+        throw new Error("Failed to make changes this book.")
+    }
+}
+}
