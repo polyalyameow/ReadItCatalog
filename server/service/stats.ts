@@ -1,6 +1,5 @@
 import { getUserSavedBooks } from "./user";
 import logger from "../logger";
-import { BookRow, UserAndBookRow } from "../../shared/types/types";
 
 export const getGeneralStats = async (userId: string) => {
   const allBooks = await getUserSavedBooks(userId);
@@ -50,9 +49,12 @@ export const getMontlyStats = async (userId: string) => {
     return;
   }
 
+  const currentYear = new Date().getFullYear();
+  const currentYearBooks = allBooks.filter(book => book.year_of_reading === currentYear);
+
   const monthlyRegister: Record<string, typeof allBooks> = {}
 
-  allBooks.forEach((book) => {
+  currentYearBooks.forEach((book) => {
     if (book.month_of_reading) {
       if (monthlyRegister[book.month_of_reading]) {
         monthlyRegister[book.month_of_reading].push(book);

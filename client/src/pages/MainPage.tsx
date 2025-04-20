@@ -4,12 +4,15 @@ import { HStack, Button, Text, Dialog, CloseButton, Portal, Input, Box } from '@
 import { PlusIcon } from '@heroicons/react/24/outline'
 import { getBooks } from '../api/books'
 import { IsbnSchema } from '../../../shared/types/types'
+import { useNavigate } from 'react-router-dom'
 
 const MainPage = () => {
     const [error, setError] = useState<string | null>(null)
     const [value, setValue] = useState<string>("")
     const [bookUpdateKey, setBookUpdateKey] = useState(0);
     const [opened, setOpened] = useState<boolean>(false); 
+
+    const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValue(e.target.value.trim());
@@ -70,7 +73,7 @@ const MainPage = () => {
     </Portal>
   </Dialog.Root> 
         
-        <Button>
+        <Button onClick={() => navigate("/stats")}>
             <Text>Statistics</Text>
         </Button>
     </HStack>
