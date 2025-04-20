@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/server/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint . --ext .ts,.tsx"
   },
   "keywords": [],
   "author": "",

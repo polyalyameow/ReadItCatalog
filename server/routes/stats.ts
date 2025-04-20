@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import { getPolarChartStatsController } from '../controller/stats';
+import { getGeneralStatsController, getMontlyStatsController } from '../controller/stats';
+
 
 const router = Router();
 
-//router.get('/general', getPolarChartStatsController);
+router.get('/general', getGeneralStatsController);
+router.get('/monthly', getMontlyStatsController);
 
 export default router;

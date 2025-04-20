@@ -1,21 +1,23 @@
-import { getBookStatsForPolarChart } from "../service/stats";
 import { Request, Response } from "express";
+import { AuthRequest } from "../middleware/verifyJwt";
+import { getGeneralStats, getMontlyStats } from "../service/stats";
 
-export const getPolarChartStatsController = async (req: Request, res: Response): Promise<Response> => {
-    const { year, month } = req.query;
+export const getGeneralStatsController = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.currentUser?.id as string;
+    const generalStats = await getGeneralStats(userId);
+    res.status(200).json(generalStats);
+  } catch (error) {
+    res.status(500).json({ message: "Error getting general stats", error });
+  }
+};
 
-    if (year && isNaN(Number(year))) {
-        return res.status(400).json({ error: 'Invalid year provided.' });
-      }
-    
-      if (month && !["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].includes(String(month))) {
-        return res.status(400).json({ error: 'Invalid month provided.' });
-      }
-    
-      try {
-        const stats = await getBookStatsForPolarChart({ year: Number(year), month: String(month) });
-        return res.json(stats);
-      } catch (error) {
-        return res.status(500).json({ error: 'Failed to fetch book stats.' });
-      }
-  };
+export const getMontlyStatsController = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.currentUser?.id as string;
+    const montlyStats = await getMontlyStats(userId);
+    res.status(200).json(montlyStats);
+  } catch (error) {
+    res.status(500).json({ message: "Error getting monthly stats", error });
+  }
+}

@@ -1,96 +1,114 @@
-import { BookInfo, BookRow } from "../../shared/types/types";
-import { db } from "../config/db";
-import { books, userBookFeedback, userBooks } from "../db/schema";
-import { eq, and, not, or } from "drizzle-orm";
+import { getUserSavedBooks } from "./user";
+import logger from "../logger";
+import { BookRow, UserAndBookRow } from "../../shared/types/types";
 
-type TimeScope = { year?: number; month?: string };
+export const getGeneralStats = async (userId: string) => {
+    const allBooks = await getUserSavedBooks(userId);
+    if (!allBooks) {
+      logger.error("No books found")
+      return;
+    }
+    const totalBooks = allBooks.length;
+    const totalPages = allBooks.reduce((sum, book) => {
+      return sum + (book.page_count ?? 0);
+    }, 0);
+    const totalLanguages: Record<string, number>  = {}
+    allBooks.forEach((book) => {
+     if (book.language) {
+      if (totalLanguages[book.language]) {
+        totalLanguages[book.language] += 1;
+      } else {
+        totalLanguages[book.language] = 1;
+      }
+     }});
 
-export const getBookStatsForPolarChart = async ({ year, month }: TimeScope) => {
-  let feedbacks = [];
-
-  if (year) {
-    feedbacks = await db
-      .select()
-      .from(userBookFeedback)
-      .where(eq(userBookFeedback.year_of_reading, year))
-      .execute();
-  } else if (month) {
-    feedbacks = await db
-      .select()
-      .from(userBookFeedback)
-      .where(eq(userBookFeedback.month_of_reading, month))
-      .execute();
-  } else {
-    feedbacks = await db.select().from(userBookFeedback).execute();
-  }
-
-  let filteredBooks = [];
-  if (year || month) {
-    const userBookIds = feedbacks.map(f => f.user_book_id);
+    const totalRating: Record<string, number>  = {}
+    allBooks.forEach((book) => {
+      if (book.rating) {
+       if (totalRating[book.rating]) {
+        totalRating[book.rating] += 1;
+       } else {
+        totalRating[book.rating] = 1;
+       }
+      }});
     
-    let booksJoined: any[] = [];
-    if (userBookIds.length > 0) {
-      booksJoined = await db
-        .select()
-        .from(userBooks)
-        .innerJoin(books, eq(userBooks.isbn, books.isbn))
-        .where(or(...userBookIds.map(id => eq(userBooks.id, id))))
-        .execute();
+  return {
+    totalBooks: totalBooks,
+    totalPages: totalPages,
+    totalLanguages: totalLanguages,
+    totalRating: totalRating
+  }
+}
+
+
+export const getMontlyStats = async (userId: string) => {
+  const allBooks = await getUserSavedBooks(userId);
+    if (!allBooks) {
+      logger.error("No books found")
+      return;
     }
 
-    filteredBooks = booksJoined
-      .map(b => b.books)
-      .filter(book => book.genre !== "unknown" && book.language !== "unknown");
-  } else {
-    const allBooks = await db
-      .select()
-      .from(books)
-      .where(and(
-        not(eq(books.genre, "unknown")),
-        not(eq(books.language, "unknown"))
-      ))
-      .execute();
-    filteredBooks = allBooks;
-  }
+    const monthlyRegister: Record<string, typeof allBooks>  = {}
 
-  if (filteredBooks.length === 0) {
-    return {
-      labels: ["No Data Available"],
-      data: [0]
-    };
-  }
+    allBooks.forEach((book) => {
+      if (book.month_of_reading) {
+       if (monthlyRegister[book.month_of_reading]) {
+        monthlyRegister[book.month_of_reading].push(book);
+       } else {
+        monthlyRegister[book.month_of_reading] = [book];
+       }
+      }});
 
-  const totalBooks = filteredBooks.length;
-  const totalPages = filteredBooks.reduce((sum, b) => sum + (b.page_count || 0), 0);
+  
+    const monthStats: Record<string, {totalBooks: number;
+      totalPages: number;
+      totalLanguages: Record<string, number>;
+      totalRating: Record<string, number>;}> = {};
 
-  const genreMap: Record<string, number> = {};
-  const languageMap: Record<string, number> = {};
-  const ratingMap: Record<string, number> = {};
+    for (const [month, books] of Object.entries(monthlyRegister)) {
+      const totalBooks = books.length;
+      const totalPages = books.reduce((sum, book) => sum + (book.page_count ?? 0), 0);
 
-  filteredBooks.forEach(book => {
-    if (book.genre) genreMap[book.genre] = (genreMap[book.genre] || 0) + 1;
-    if (book.language) languageMap[book.language] = (languageMap[book.language] || 0) + 1;
-  });
+      const totalLanguages: Record<string, number> = {};
+      books.forEach((book) => {
+        if (book.language) {
+         if (totalLanguages[book.language]) {
+           totalLanguages[book.language] += 1;
+         } else {
+           totalLanguages[book.language] = 1;
+         }
+        }});
 
-  feedbacks.forEach(fb => {
-    const label = fb.rating?.toString() || "Unrated";
-    ratingMap[label] = (ratingMap[label] || 0) + 1;
-  });
+      const totalRating: Record<string, number> = {};
+      books.forEach((book) => {
+        if (book.rating) {
+         if (totalRating[book.rating]) {
+          totalRating[book.rating] += 1;
+         } else {
+          totalRating[book.rating] = 1;
+         }
+        }});
+      
+        monthStats[month] = {
+          totalBooks,
+          totalPages,
+          totalLanguages,
+          totalRating,
+        };
+    }
 
-  return {
-    labels: [
-      ...Object.keys(genreMap).map(g => `Genre: ${g}`),
-      ...Object.keys(languageMap).map(l => `Language: ${l}`),
-      ...Object.keys(ratingMap).map(r => `Rating: ${r}`),
-      "Total Books",
-      "Total Pages"
-    ],
-    data: [
-      ...Object.values(genreMap),
-      ...Object.values(languageMap),
-      ...Object.values(ratingMap),
-      totalBooks,
-      totalPages
-    ]
-  };
-};
+    const monthOrder = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+  
+    const orderedStats: typeof monthStats = {};
+    monthOrder.forEach((month) => {
+      if (monthStats[month]) {
+        orderedStats[month] = monthStats[month];
+      }
+    });
+  
+    return orderedStats;
+    
+}

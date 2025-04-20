@@ -85,8 +85,10 @@ const parseBookInfo = async (
 
   console.log('LANGUAGE', data.instanceOf?.language?.[0]?.code)
   console.log('LANGUAGE', data.instanceOf?.language);
+  console.log(bookInfo);
   return BookInfoSchema.parse(bookInfo);
 };
+
 
 function extractYear(year: number | string | undefined): number {
   if (typeof year === "number") return year;
