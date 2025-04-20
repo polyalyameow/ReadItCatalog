@@ -1,4 +1,4 @@
-import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Textarea, Dialog, CloseButton, Portal } from '@chakra-ui/react'
+import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Textarea, Dialog, Portal } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { deleteUserBook, getUserBooks, patchUserBook } from '../api/user'
 import { BookFeedbackSchema, UserAndBookRow } from '../../../shared/types/types'
@@ -14,7 +14,7 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
   const [editingValues, setEditingValues] = useState<{ [key: string]: Partial<UserAndBookRow> }>({});
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
-  const [opened, setOpened] = useState<boolean>(false); 
+  const [openedBookId, setOpenedBookId] = useState<string | null>(null);
   
 
 
@@ -46,8 +46,12 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
         if (Array.isArray(parsed)) {
           tagArray = parsed;
         }
-      } catch (e) {
-        return '🤷‍♀️ Invalid tags format';
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message || "Invalid tag format");
+        } else {
+          setError("An unknown error occurred");
+        }
       }
     } else if (Array.isArray(tags)) {
       tagArray = tags;
@@ -70,9 +74,10 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
 
   const deleteBook = async (id: string) => {
     try {
+      console.log("Deleting book with ID:", id); 
       await deleteUserBook(id)
       setUserBooks(prevBooks => prevBooks.filter(book => book.user_book_id !== id));
-      setOpened(false);
+      setOpenedBookId(null);
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message || "Failed to delete a book");
@@ -128,16 +133,22 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
 
     return (
     <Table.Row key={index} >
-      <Table.Cell>
-        <VStack gap={10} mr={4}>
+      <Table.Cell width="1px"
+        whiteSpace="normal" maxWidth="100px">
+        <VStack gap={10} pr={4}>
+        <Box boxSize="4">
+          <Button variant="outline" size="sm" onClick={() => toggleEditMode(item.user_book_id)}>
+            <PencilIcon />
+          </Button>
+          </Box>
           <Box boxSize="4">
-          <Dialog.Root>
+          <Dialog.Root open={openedBookId === item.user_book_id}>
       <Dialog.Trigger asChild>
-        <Button variant="outline" size="sm" onClick={() => setOpened(true)}>
+        <Button variant="outline" size="sm" onClick={() => setOpenedBookId(item.user_book_id)}>
         <TrashIcon />
         </Button>
       </Dialog.Trigger>
-      {opened && 
+      {/* {opened &&  */}
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
@@ -152,24 +163,17 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
             </Dialog.Body>
             <Dialog.Footer>
               <Dialog.ActionTrigger asChild>
-                <Button variant="outline" onClick={() => setOpened(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setOpenedBookId(null)}>Cancel</Button>
               </Dialog.ActionTrigger>
-              <Button onClick={() => deleteBook(item.user_book_id)}>Delete</Button>
+              <Dialog.ActionTrigger asChild>
+                <Button onClick={() => deleteBook(item.user_book_id)}>Delete</Button>
+              </Dialog.ActionTrigger>
             </Dialog.Footer>
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>
-      }
+      {/* } */}
     </Dialog.Root>
-{/* 
-          <Button variant="outline" size="sm" onClick={() => deleteBook(item.user_book_id)}>
-            <TrashIcon />
-          </Button> */}
-          </Box>
-          <Box boxSize="4">
-          <Button variant="outline" size="sm" onClick={() => toggleEditMode(item.user_book_id)}>
-            <PencilIcon />
-          </Button>
           </Box>
         </VStack>
     </Table.Cell>
@@ -299,7 +303,7 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
           </Text>
       </Box>
           ) : (
-        item.comment
+        <Text textAlign="center">{item.comment}</Text>
       )}
     </Table.Cell>
     </Table.Row>);

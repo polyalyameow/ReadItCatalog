@@ -11,6 +11,7 @@ const MainPage = () => {
     const [value, setValue] = useState<string>("")
     const [bookUpdateKey, setBookUpdateKey] = useState(0);
     const [opened, setOpened] = useState<boolean>(false); 
+    const [clicked, setClicked] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -20,16 +21,17 @@ const MainPage = () => {
 
     const onSave = async () => {
       const validation = IsbnSchema.safeParse(value);
+      setClicked(true)
   
       if (!validation.success) {
         const firstError = validation.error.errors[0]?.message || "Invalid ISBN";
         setError(firstError);
+        setClicked(false)
         return;
       }
       
       try {
           await getBooks(value);
-          //await new Promise(res => setTimeout(res, 500));
           setBookUpdateKey(prev => prev + 1); 
           setError(null);
           setOpened(false);
@@ -39,6 +41,8 @@ const MainPage = () => {
             } else {
               setError("An unknown error occurred");
             }
+      } finally {
+        setClicked(false);
       }
     }
 
@@ -63,7 +67,7 @@ const MainPage = () => {
             {error && <Box color="red.500">{error}</Box>}
           </Dialog.Body>
           <Dialog.Footer>
-              <Button variant="outline" onClick={onSave}>Save</Button>
+              <Button variant="outline" loading={clicked} loadingText="Saving..." onClick={onSave}>Save</Button>
           </Dialog.Footer>
           <Dialog.CloseTrigger asChild>
             <CloseButton size="sm" onClick={() => setOpened(false)} />
