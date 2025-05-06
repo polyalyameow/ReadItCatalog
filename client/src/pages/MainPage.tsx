@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import MyBooks from './MyBooks'
 import { HStack, Button, Text, Dialog, CloseButton, Portal, Input, Box } from '@chakra-ui/react'
-import { PlusIcon } from '@heroicons/react/24/outline'
+import { BellAlertIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { getBooks } from '../api/books'
 import { IsbnSchema } from '../../../shared/types/types'
 import { useNavigate } from 'react-router-dom'
@@ -12,6 +12,7 @@ const MainPage = () => {
     const [bookUpdateKey, setBookUpdateKey] = useState(0);
     const [opened, setOpened] = useState<boolean>(false); 
     const [clicked, setClicked] = useState<boolean>(false);
+    const [showInfo, setShowInfo] = useState(true);
 
     const navigate = useNavigate();
 
@@ -77,11 +78,14 @@ const MainPage = () => {
     </Portal>
   </Dialog.Root> 
         
-        <Button onClick={() => navigate("/stats")}>
+        <Button variant="outline" onClick={() => navigate("/stats")}>
             <Text>Statistik</Text>
         </Button>
+        <Button onClick={() => setShowInfo((prev) => !prev)} m={4} variant="outline">
+          <BellAlertIcon style={{ color: showInfo ? 'black' : 'red', width: '1.5rem', height: '1.5rem' }} />
+        </Button>
     </HStack>
-    <MyBooks key={bookUpdateKey} bookUpdateKey={bookUpdateKey}/>
+    <MyBooks key={bookUpdateKey} bookUpdateKey={bookUpdateKey} showInfo={showInfo} setShowInfo={setShowInfo}/>
     </>
   )
 }

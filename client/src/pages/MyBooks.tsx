@@ -1,13 +1,14 @@
-import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Textarea, Dialog, Portal } from '@chakra-ui/react'
+import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Textarea, Dialog, Portal, CloseButton } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { deleteUserBook, getUserBooks, patchUserBook } from '../api/user'
 import { BookFeedbackSchema, UserAndBookRow } from '../../../shared/types/types'
-import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
+import { TrashIcon, PencilIcon, BellAlertIcon } from '@heroicons/react/24/outline'
 import default_book from '../assets/default_book.jpg'
 import { z } from 'zod'
+import { AnimatePresence, motion } from 'framer-motion';
 
-const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
-
+const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: number, showInfo: boolean, setShowInfo: Dispatch<SetStateAction<boolean>> }) => {
+  const MotionBox = motion(Box);
   const [userBooks, setUserBooks] = useState<UserAndBookRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +16,7 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
   const [openedBookId, setOpenedBookId] = useState<string | null>(null);
-  
+  // const [showInfo, setShowInfo] = useState(true);
 
 
    useEffect(() => {
@@ -350,15 +351,48 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
   /> :
     (
     <>
-    <Text>
-      Hej!
-      Tack för att du använder ReadIt! Det här är en beta-version, så:
-      1. Just nu fungerar webbsidan bara med fysiska böcker – använd därför ISBN som tillhör tryckta böcker.
-      2. Ibland kan det ta en stund innan informationen hämtas från Libris API, så ha tålamod.
+      <Box display="flex" alignItems="center" justifyContent="center">
+        <AnimatePresence>
+          {showInfo && (
+            <MotionBox
+              key="info"
+              w="90%"
+              p={4}
+              m={4}
+              bg="gray.50"
+              borderRadius="lg"
+              boxShadow="md"
+              position="relative"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CloseButton
+                position="absolute"
+                top={2}
+                right={2}
+                onClick={() => setShowInfo(false)}
+              />
 
-      ...och allt detta kommer snart att förbättras! 😊
-    </Text>
-    <Table.Root mt={8}>
+              <Text fontSize="xl" fontWeight="bold" mb={2} textAlign="center">
+                Hej och välkommen till ReadIt! 📚
+              </Text>
+
+              <Text mb={4} textAlign="center">
+                Du använder just nu en <strong>beta-version</strong> av tjänsten. Här är några saker att tänka på:
+              </Text>
+
+              <Box as="ul" pl={4} color="gray.700" fontSize="md" lineHeight="1.8">
+                <li><strong>1.</strong> Endast <em>fysiska böcker</em> fungerar just nu – använd ISBN från tryckta utgåvor.</li>
+                <li><strong>2.</strong> Libris API kan ta lite tid – ha tålamod. 🙏</li>
+                <li><strong>3.</strong> Förbättringar är på gång – tack för att du testar! 😊</li>
+              </Box>
+            </MotionBox>
+          )}
+        </AnimatePresence>
+      </Box>
+    <Table.Root mt={8} stickyHeader>
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader></Table.ColumnHeader>

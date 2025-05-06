@@ -21,6 +21,7 @@
     "drizzle-kit": "^0.30.6",
     "drizzle-orm": "^0.41.0",
     "express": "^4.21.2",
+    "framer-motion": "^12.9.7",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.0",
     "node-fetch": "^3.3.2",
