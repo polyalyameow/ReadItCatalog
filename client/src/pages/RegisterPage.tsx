@@ -29,7 +29,6 @@ const RegisterPage = () => {
         UserRegistrationSchema.parse(formData);
     
         const response = await registerUser(formData);
-        console.log("Register successful:", response);
         localStorage.setItem("token", response.token);
         register(response.token);
         navigate("/");
@@ -43,9 +42,9 @@ const RegisterPage = () => {
         });
         setFormErrors(errors);
         } else if (err instanceof Error) {
-        setError(err.message || "Register failed");
+        setError(err.message || "Registrering misslyckades");
         } else {
-        setError("An unknown error occurred");
+        setError("Ett okänt fel har inträffat");
         }
     }
     };
@@ -67,7 +66,7 @@ const RegisterPage = () => {
               {formErrors && <Box color="red.500">{formErrors.email}</Box>}
             </Field.Root>
             <Field.Root id="username" mb={4}>
-              <Field.Label>Username</Field.Label>
+              <Field.Label>Usernamn</Field.Label>
               <Input
                 type="username"
                 name="username"
@@ -78,7 +77,7 @@ const RegisterPage = () => {
               {formErrors && <Box color="red.500">{formErrors.username}</Box>}
             </Field.Root>
             <Field.Root id="password" mb={4}>
-              <Field.Label>Password</Field.Label>
+              <Field.Label>Lösenord</Field.Label>
               <Input
                 type="password"
                 name="password"
@@ -89,7 +88,7 @@ const RegisterPage = () => {
               {formErrors && <Box color="red.500">{formErrors.password}</Box>}
             </Field.Root>
             <Field.Root id="confirm_password" mb={4}>
-              <Field.Label>Confirm Password</Field.Label>
+              <Field.Label>Bekräfta lösenord</Field.Label>
               <Input
                 type="password"
                 name="confirm_password"
@@ -101,7 +100,7 @@ const RegisterPage = () => {
             </Field.Root>
             {error && <Box color="red.500">{error}</Box>}
             <Button type="submit" colorScheme="teal" width="full">
-              Register
+              Registrera
             </Button>
           </form>
         </Box>

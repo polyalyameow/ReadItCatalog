@@ -34,9 +34,6 @@ const MonthlyStats = () => {
 
     return (
         <Box p={4}>
-            <Text fontSize="2xl" fontWeight="bold" mb={6}>
-                Monthly Stats
-            </Text>
             <SimpleGrid templateColumns="repeat(auto-fill, minmax(350px, 1fr))" p={4}>
                 {Object.keys(stats).map((month, index) => {
                     const monthData = stats[month];
@@ -64,14 +61,14 @@ const MonthlyStats = () => {
 
                                     <Stack mt={4}>
                                         <Text fontWeight="bold">
-                                            Total Books: {monthData.totalBooks}
+                                            Totalt antal böcker: {monthData.totalBooks}
                                         </Text>
                                         <Text fontWeight="bold">
-                                            Total Pages: {monthData.totalPages}
+                                            Totalt antal sidor: {monthData.totalPages}
                                         </Text>
 
                                         <Text fontWeight="bold" mt={2}>
-                                            Languages:
+                                            Språk:
                                         </Text>
                                         {languageData.length ? (
                                             <Box pl={4}>
@@ -83,12 +80,12 @@ const MonthlyStats = () => {
                                             </Box>
                                         ) : (
                                             <Text pl={4} fontSize="sm">
-                                                No language data
+                                                Inga språkdata
                                             </Text>
                                         )}
 
                                         <Text fontWeight="bold" mt={2}>
-                                            Ratings:
+                                            Betyg:
                                         </Text>
                                         {ratingData.length ? (
                                             <Box pl={4}>
@@ -107,7 +104,7 @@ const MonthlyStats = () => {
                                             </Box>
                                         ) : (
                                             <Text pl={4} fontSize="sm">
-                                                No ratings
+                                                Inga betyg
                                             </Text>
                                         )}
                                     </Stack>

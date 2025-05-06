@@ -24,7 +24,7 @@ const MainPage = () => {
       setClicked(true)
   
       if (!validation.success) {
-        const firstError = validation.error.errors[0]?.message || "Invalid ISBN";
+        const firstError = validation.error.errors[0]?.message || "Fel ISBN";
         setError(firstError);
         setClicked(false)
         return;
@@ -37,9 +37,9 @@ const MainPage = () => {
           setOpened(false);
       } catch (err: unknown) {
           if (err instanceof Error) {
-              setError(err.message ? err.message : "Failed to load the book");
+              setError(err.message ? err.message : "Kunde inte få information om boken");
             } else {
-              setError("An unknown error occurred");
+              setError("Ett okänt fel inträffade");
             }
       } finally {
         setClicked(false);
@@ -60,14 +60,14 @@ const MainPage = () => {
       <Dialog.Positioner>
         <Dialog.Content>
           <Dialog.Header>
-            <Dialog.Title>Please type in ISBN of the book you want to add</Dialog.Title>
+            <Dialog.Title>Vänligen skriv in ISBN för boken du vill lägga till</Dialog.Title>
           </Dialog.Header>
           <Dialog.Body>
             <Input placeholder="ISBN" onChange={handleChange}/>
             {error && <Box color="red.500">{error}</Box>}
           </Dialog.Body>
           <Dialog.Footer>
-              <Button variant="outline" loading={clicked} loadingText="Saving..." onClick={onSave}>Save</Button>
+              <Button variant="outline" loading={clicked} loadingText="Sparar..." onClick={onSave}>Spara</Button>
           </Dialog.Footer>
           <Dialog.CloseTrigger asChild>
             <CloseButton size="sm" onClick={() => setOpened(false)} />
@@ -78,7 +78,7 @@ const MainPage = () => {
   </Dialog.Root> 
         
         <Button onClick={() => navigate("/stats")}>
-            <Text>Statistics</Text>
+            <Text>Statistik</Text>
         </Button>
     </HStack>
     <MyBooks key={bookUpdateKey} bookUpdateKey={bookUpdateKey}/>

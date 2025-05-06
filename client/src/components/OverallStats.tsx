@@ -34,37 +34,34 @@ const OverallStats = () => {
   
     return (
       <Box p={4}>
-        <Text fontSize="2xl" fontWeight="bold" mb={6}>
-          General Stats
-        </Text>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} p={4}>
           <Card.Root boxShadow="md" p={4}>
             <CardHeader>
-              <Text fontSize="lg" fontWeight="bold">Total Books</Text>
+              <Text fontSize="lg" fontWeight="bold">Totalt antal böcker</Text>
             </CardHeader>
             <CardBody>
               <Stat.Root>
                 <Stat.ValueText>{generalStats?.totalBooks}</Stat.ValueText>
-                <StatHelpText>Books Added</StatHelpText>
+                <StatHelpText>Tillagda böcker</StatHelpText>
               </Stat.Root>
             </CardBody>
           </Card.Root>
   
           <Card.Root boxShadow="md" p={4}>
             <CardHeader>
-              <Text fontSize="lg" fontWeight="bold">Total Pages</Text>
+              <Text fontSize="lg" fontWeight="bold">Totalt antal sidor</Text>
             </CardHeader>
             <CardBody>
               <Stat.Root>
                 <Stat.ValueText>{generalStats?.totalPages}</Stat.ValueText>
-                <StatHelpText>Pages Read</StatHelpText>
+                <StatHelpText>Lästa sidor</StatHelpText>
               </Stat.Root>
             </CardBody>
           </Card.Root>
   
           <Card.Root boxShadow="md" p={4}>
             <CardHeader>
-              <Text fontSize="lg" fontWeight="bold">Languages</Text>
+              <Text fontSize="lg" fontWeight="bold">Språk</Text>
             </CardHeader>
             <CardBody>
               {Object.entries(generalStats?.totalLanguages || {}).map(([language, count]) => (
@@ -74,7 +71,7 @@ const OverallStats = () => {
           </Card.Root>
         </SimpleGrid>
 
-        <Text fontSize="xl" fontWeight="bold" mb={4}>Ratings Distribution</Text>
+        <Text fontSize="xl" fontWeight="bold" mb={4}>Betygsfördelning</Text>
         <ResponsiveContainer width="100%" height={400}>
           <PieChart>
             <Pie

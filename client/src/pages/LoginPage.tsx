@@ -39,7 +39,7 @@ const LoginPage = () => {
     <Box maxW="md" mx="auto" p={4} mt={8}>
       <form onSubmit={handleSubmit}>
         <Field.Root id="email" mb={4}>
-          <Field.Label>Email</Field.Label>
+          <Field.Label>E-postadress</Field.Label>
           <Input
             type="email"
             name="email"
@@ -49,7 +49,7 @@ const LoginPage = () => {
           />
         </Field.Root>
         <Field.Root id="password" mb={4}>
-          <Field.Label>Password</Field.Label>
+          <Field.Label>Lösenord</Field.Label>
           <Input
             type="password"
             name="password"
@@ -60,7 +60,7 @@ const LoginPage = () => {
         </Field.Root>
         {error && <Box color="red.500">{error}</Box>}
         <Button type="submit" colorScheme="teal" width="full">
-          Login
+          Logga in
         </Button>
       </form>
     </Box>

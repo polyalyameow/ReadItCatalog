@@ -9,7 +9,7 @@ export const getBooks = async (isbn: string) => {
           if (error instanceof z.ZodError) {
               throw new Error(error.message);
           } else {
-              throw new Error("Failed to find this book. Please double check ISBN")
+              throw new Error("Kunde inte hitta boken. Kontrollera ISBN och försök igen.")
           }
     }
 };

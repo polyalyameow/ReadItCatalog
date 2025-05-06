@@ -131,7 +131,7 @@ const fetchValidImage = async (isbn: string): Promise<string> => {
   const imageSources = ["bokrondellen", "nielsen"];
   const defaultImagePath = "default";
 
-  for (let img_db of imageSources) {
+  for (const img_db of imageSources) {
     const imageUrl = `https://xinfo.libris.kb.se/xinfo/getxinfo?identifier=/PICTURE/${img_db}/isbn/${isbn}/${isbn}.jpg/orginal`;
 
     try {
@@ -141,8 +141,6 @@ const fetchValidImage = async (isbn: string): Promise<string> => {
       logger.debug(`Checking image from ${img_db} - Status: ${response.status}`);
       logger.debug("Headers:", response.headers);
       const contentType = response.headers["content-type"] || "";
-      const contentLength =
-        parseInt(response.headers["content-length"], 10) || 0;
       const isChunked = response.headers["transfer-encoding"] === "chunked";
       const isValidImage = contentType.startsWith("image/");
 

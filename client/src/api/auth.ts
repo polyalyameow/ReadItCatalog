@@ -10,7 +10,7 @@ export const registerUser = async (data: UserRegistration) => {
         if (error instanceof z.ZodError) {
             throw new Error(error.message);
         } else {
-            throw new Error("Registration failed")
+            throw new Error("Registreringen misslyckades")
         }
   }
 };
@@ -24,7 +24,7 @@ export const loginUser = async (data: UserLogin) => {
     if (error instanceof z.ZodError) {
         throw new Error(error.message);
     } else {
-        throw new Error("Wrong email or password")
+        throw new Error("Fel email eller lösenord")
     }
 }
 };
@@ -37,7 +37,7 @@ export const logoutUser = async (token: string) => {
     if (error instanceof z.ZodError) {
         throw new Error(error.message);
     } else {
-        throw new Error("Logout failed")
+        throw new Error("Utloggning misslyckades")
     }
 }
 };

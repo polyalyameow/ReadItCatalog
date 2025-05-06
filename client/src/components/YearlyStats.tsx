@@ -36,10 +36,6 @@ const YearlyStats = () => {
     
       return (
         <Box p={4}>
-          <Text fontSize="2xl" fontWeight="bold" mb={6}>
-            Yearly Stats
-          </Text>
-          
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} p={4}>
             {Object.entries(yearlyStats).reverse().map(([year, stats]) => (
               <Card.Root key={year} boxShadow="md" p={4} m={2} >
@@ -49,16 +45,16 @@ const YearlyStats = () => {
                   </Card.Title>
                 </CardHeader>
                 <Card.Body>
-                  <Text>Total Books: {stats.totalBooks}</Text>
-                  <Text>Total Pages: {stats.totalPages}</Text>
-                  <Text>Languages:</Text>
+                  <Text>Totalt antal böcker: {stats.totalBooks}</Text>
+                  <Text>Totalt antal sidor: {stats.totalPages}</Text>
+                  <Text>Språk:</Text>
                   <Box pl={4}>
                     {Object.entries(stats.totalLanguages).map(([language, count]) => (
                       <Text key={language}>{language}: {count}</Text>
                     ))}
                   </Box>
     
-                  <Text>Ratings:</Text>
+                  <Text>Betyg:</Text>
                   <Box pl={4}>
                     {renderRating(stats.totalRating)}
                   </Box>

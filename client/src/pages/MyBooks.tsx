@@ -24,7 +24,7 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
         const books = await getUserBooks();
         setUserBooks(books);
       } catch (err) {
-        console.error("Failed to fetch user books", err);
+        console.error("Kunde inte hämta användarens böcker", err);
       } finally {
         setLoading(false);
       }
@@ -48,19 +48,19 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
         }
       } catch (error: unknown) {
         if (error instanceof Error) {
-          setError(error.message || "Invalid tag format");
+          setError(error.message || "Ogiltigt taggformat");
         } else {
-          setError("An unknown error occurred");
+          setError("Ett okänt fel har inträffat");
         }
       }
     } else if (Array.isArray(tags)) {
       tagArray = tags;
     } else {
-      return '🤷‍♀️ No tags';
+      return '🤷‍♀️ Inga taggar';
     }
 
     const filtered = [...new Set (tagArray.filter(tag => tag && tag !== 'Unknown'))];
-    return filtered.length > 0 ? filtered.join(', ') : '🤷‍♀️ No tags';
+    return filtered.length > 0 ? filtered.join(', ') : '🤷‍♀️ Inga taggar';
   };
 
   const convertRating = (rating: number) => {
@@ -74,15 +74,14 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
 
   const deleteBook = async (id: string) => {
     try {
-      console.log("Deleting book with ID:", id); 
       await deleteUserBook(id)
       setUserBooks(prevBooks => prevBooks.filter(book => book.user_book_id !== id));
       setOpenedBookId(null);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setError(error.message || "Failed to delete a book");
+        setError(error.message || "Misslyckades med att ta bort boken");
       } else {
-        setError("An unknown error occurred");
+        setError("Ett okänt fel inträffade");
       }
     }
   }
@@ -105,12 +104,11 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
       } catch (error) {
         if (error instanceof z.ZodError) {
           const errorMessages = error.issues.map((issue) => issue.message).join("\n");
-          alert("Validation failed:\n" + errorMessages);
+          alert("Validering har inte gått igenom:\n" + errorMessages);
           return;
         }
       }
         try {
-          console.log('Patching book:', data);
           await patchUserBook(id, data);
           setEditingValues(prev => ({ ...prev, [id]: {} }));
           setUserBooks(prev =>
@@ -121,7 +119,6 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
             )
           );
           setEditingRowId(null);
-        console.log('Update successful');
         } catch (err) {
           console.error('Failed to patch:', err);
         }
@@ -148,45 +145,43 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
         <TrashIcon />
         </Button>
       </Dialog.Trigger>
-      {/* {opened &&  */}
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
           <Dialog.Content>
             <Dialog.Header>
-              <Dialog.Title>Are you sure that you want to delete this book?</Dialog.Title>
+              <Dialog.Title>Är du säker på att du vill ta bort boken?</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
               <p>
-              This action cannot be undone. The book and all related data will be permanently deleted.
+              Denna åtgärd kan inte ångras. Boken och all relaterad data kommer att raderas permanent.
               </p>
             </Dialog.Body>
             <Dialog.Footer>
               <Dialog.ActionTrigger asChild>
-                <Button variant="outline" onClick={() => setOpenedBookId(null)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setOpenedBookId(null)}>Avbryta</Button>
               </Dialog.ActionTrigger>
               <Dialog.ActionTrigger asChild>
-                <Button onClick={() => deleteBook(item.user_book_id)}>Delete</Button>
+                <Button onClick={() => deleteBook(item.user_book_id)}>Ta bort</Button>
               </Dialog.ActionTrigger>
             </Dialog.Footer>
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>
-      {/* } */}
     </Dialog.Root>
           </Box>
         </VStack>
     </Table.Cell>
       <Table.Cell width="1px"
         whiteSpace="normal"
-        maxWidth="300px">
+        >
         <Image src={!item.image_url ||item.image_url === "default" ? default_book : item.image_url} h="200px"
-          maxW={150}
+          maxW={100}
           fit="contain"/>
       </Table.Cell>
       <Table.Cell width="1px"
         whiteSpace="normal"
-        maxWidth="300px">{item.isbn}</Table.Cell>
+        maxWidth="100px" textAlign="center">{item.isbn}</Table.Cell>
       <Table.Cell width="100px"
         whiteSpace="normal"
         maxWidth="500px"
@@ -211,15 +206,26 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
       <Table.Cell width="1px"
         whiteSpace="normal"
         maxWidth="300px">{item.page_count}</Table.Cell>
-      {/* <Table.Cell w={150} textAlign="center">{item.rating ? convertRating(item.rating) : convertRating(0)}</Table.Cell> */}
       <Table.Cell w={150} textAlign="center">
       {editingRowId === item.user_book_id ? (
             <Input
               size="sm"
               maxW={12}
               placeholder="1–5"
-              value={editingValues[item.user_book_id]?.rating ?? item.rating ?? 0}
-              onChange={(e) => handleEditChange(item.user_book_id, 'rating', Number(e.target.value))}
+              value={
+                editingValues[item.user_book_id]?.rating !== undefined
+                  ? editingValues[item.user_book_id]?.rating ?? ''
+                  : item.rating ?? ''
+              }            
+              onChange={(e) => {
+                const val = e.target.value.trim();
+                handleEditChange(
+                  item.user_book_id,
+                  'rating',
+                  val === '' ? null : Number(val)
+                );
+              }}
+               
               onKeyDown={(e) => handleKeyPress(e, item.user_book_id)}
               onFocus={() => setFocusedRowId(item.user_book_id)}
               onBlur={() => setFocusedRowId(null)}
@@ -232,17 +238,22 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
             convertRating(item.rating || 0)
           )}
     </Table.Cell>
-      {/* <Table.Cell w={4}>{item.month_of_reading}</Table.Cell> */}
-      <Table.Cell width="150px"
+      <Table.Cell width="1px"
         whiteSpace="normal"
         maxWidth="300px">
   {editingRowId === item.user_book_id ? (
      <Input
      size="lg"
-     placeholder="Choose month"
-     value={editingValues[item.user_book_id]?.month_of_reading ?? item.month_of_reading ?? ""}
-     onChange={(e) => handleEditChange(item.user_book_id, 'month_of_reading', (String(e.target.value).charAt(0).toUpperCase() + String(e.target.value).slice(1).trim())
-     )}
+     placeholder="Välj månad"
+    value={
+      editingValues[item.user_book_id]?.month_of_reading !== undefined
+        ? editingValues[item.user_book_id]?.month_of_reading ?? ''
+        : item.month_of_reading ?? ''
+    }
+    onChange={(e) => {
+      const val = e.target.value.trim();
+      handleEditChange(item.user_book_id, 'month_of_reading', val === '' ? null : val);
+    }}    
      onKeyDown={(e) => handleKeyPress(e, item.user_book_id)}
      onFocus={() => setFocusedRowId(item.user_book_id)}
      onBlur={() => setFocusedRowId(null)}
@@ -250,20 +261,34 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
        border: focusedRowId === item.user_book_id ? '2px solid #3182ce' : '1px solid #e2e8f0',
        boxShadow: focusedRowId === item.user_book_id ? '0 0 10px rgba(49, 130, 206, 0.5)' : 'none',
      }}
-   />) : (
+   />) : 
+    (
       item.month_of_reading
-    )}
+        ? String(item.month_of_reading).charAt(0).toUpperCase() + String(item.month_of_reading).slice(1).trim()
+        : '❓'
+    )
+    }
   </Table.Cell>
-
-      {/* <Table.Cell  w={4}>{item.year_of_reading}</Table.Cell> */}
       <Table.Cell w={4}>
       {editingRowId === item.user_book_id ? (
             <Input
             size="sm"
             maxW={20}
-            placeholder="Year"
-            value={editingValues[item.user_book_id]?.year_of_reading ?? item.year_of_reading ?? ''}
-            onChange={(e) => handleEditChange(item.user_book_id, 'year_of_reading', Number(e.target.value))}
+            placeholder="År"
+            value={
+              editingValues[item.user_book_id]?.year_of_reading !== undefined
+                ? editingValues[item.user_book_id]?.year_of_reading ?? ''
+                : item.year_of_reading ?? ''
+            }            
+            onChange={(e) => {
+              const val = e.target.value.trim();
+              handleEditChange(
+                item.user_book_id,
+                'year_of_reading',
+                val === '' ? null : Number(val)
+              );
+            }}
+               
             onKeyDown={(e) => handleKeyPress(e, item.user_book_id)}
             onFocus={() => setFocusedRowId(item.user_book_id)}
             onBlur={() => setFocusedRowId(null)}
@@ -273,14 +298,13 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
             }}
           />
           ) : (
-            item.year_of_reading
+            item.year_of_reading == null ? '❓' : item.year_of_reading
           )}
     </Table.Cell>
-      {/* <Table.Cell>{item.comment}</Table.Cell> */}
       <Table.Cell maxWidth="100px">
       {editingRowId === item.user_book_id ? (
          <Box position="relative">
-        <Textarea placeholder="Comment can be max 1000 characters long."
+        <Textarea placeholder="Kommentaren kan vara maximalt 1000 tecken lång."
         size="md"
         h={100}
         value={editingValues[item.user_book_id]?.comment ?? item.comment ?? ''}
@@ -311,7 +335,7 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
     <Table.Row>
       <Table.Cell colSpan={15}>
         <Text textAlign="center" color="gray.500">
-          Nothing here yet :()
+          Inget här än :()
         </Text>
       </Table.Cell>
     </Table.Row>
@@ -326,23 +350,31 @@ const MyBooks = ({ bookUpdateKey }: { bookUpdateKey: number }) => {
   /> :
     (
     <>
+    <Text>
+      Hej!
+      Tack för att du använder ReadIt! Det här är en beta-version, så:
+      1. Just nu fungerar webbsidan bara med fysiska böcker – använd därför ISBN som tillhör tryckta böcker.
+      2. Ibland kan det ta en stund innan informationen hämtas från Libris API, så ha tålamod.
+
+      ...och allt detta kommer snart att förbättras! 😊
+    </Text>
     <Table.Root mt={8}>
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader></Table.ColumnHeader>
-          <Table.ColumnHeader>Image</Table.ColumnHeader>
-          <Table.ColumnHeader>ISBN</Table.ColumnHeader>
-          <Table.ColumnHeader>Title</Table.ColumnHeader>
-          <Table.ColumnHeader>Author</Table.ColumnHeader>
-          <Table.ColumnHeader>Year</Table.ColumnHeader>
-          <Table.ColumnHeader>Language</Table.ColumnHeader>
-          <Table.ColumnHeader>Genre</Table.ColumnHeader>
-          <Table.ColumnHeader>Tags</Table.ColumnHeader>
-          <Table.ColumnHeader>Pages</Table.ColumnHeader>
-          <Table.ColumnHeader textAlign="center">Rating</Table.ColumnHeader>
-          <Table.ColumnHeader textAlign="center">Month Of Reading</Table.ColumnHeader>
-          <Table.ColumnHeader textAlign="center">Year Of Reading</Table.ColumnHeader>
-          <Table.ColumnHeader textAlign="center">Comment</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Bild</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">ISBN</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Titel</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Författare</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">År</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Språk</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Genre</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Taggar</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Sidor</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Betyg</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Läsmånad</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Läsår</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="center">Kommentar</Table.ColumnHeader>
         </Table.Row>
       </Table.Header>
       <Table.Body>{rows}</Table.Body>

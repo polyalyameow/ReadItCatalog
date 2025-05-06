@@ -107,8 +107,8 @@ export const getMontlyStats = async (userId: string) => {
   }
 
   const monthOrder = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+     "Januari", "Februari", "Mars", "April", "Maj", "Juni",
+      "Juli", "Augusti", "September", "Oktober", "November", "December"
   ];
 
   const orderedStats: typeof monthStats = {};

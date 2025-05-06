@@ -10,7 +10,7 @@ export const getUserBooks = async () => {
           if (error instanceof z.ZodError) {
               throw new Error(error.message);
           } else {
-              throw new Error("Failed to load my-books page.")
+              throw new Error("Kunde inte ladda sidan Mina böcker.")
           }
     }
 };
@@ -23,7 +23,7 @@ export const deleteUserBook = async (id: string) => {
     if (error instanceof z.ZodError) {
         throw new Error(error.message);
     } else {
-        throw new Error("Failed to delete this book.")
+        throw new Error("Kunde inte ta bort boken.")
     }
 }
 };
@@ -36,7 +36,7 @@ export const patchUserBook = async (id: string, data: Partial<UserAndBookRow>) =
     if (error instanceof z.ZodError) {
         throw new Error(error.message);
     } else {
-        throw new Error("Failed to make changes this book.")
+        throw new Error("Kunde inte göra ändringar för boken.")
     }
 }
 }

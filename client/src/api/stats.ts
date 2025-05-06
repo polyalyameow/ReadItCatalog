@@ -9,7 +9,7 @@ export const getGeneralStats = async () => {
             if (error instanceof z.ZodError) {
                 throw new Error(error.message);
             } else {
-                throw new Error("Failed to find general stats for your books. Please double check ISBN")
+                throw new Error("Kunde inte hitta statistik för dina böcker.")
             }
       }
   };
@@ -23,7 +23,7 @@ export const getMonthlyStats = async () => {
         if (error instanceof z.ZodError) {
             throw new Error(error.message);
         } else {
-            throw new Error("Failed to find monthly stats for your books. Please double check ISBN")
+            throw new Error("Kunde inte hitta månadsstatistik för dina böcker.")
         }
     }
 };
@@ -38,7 +38,7 @@ export const getYearlyStats = async () => {
         if (error instanceof z.ZodError) {
             throw new Error(error.message);
         } else {
-            throw new Error("Failed to find yearly stats for your books. Please double check ISBN")
+            throw new Error("Kunde inte hitta årsstatistik för dina böcker.")
         }
     }
 };

@@ -14,44 +14,29 @@ const Navbar = () => {
       logout();
       window.location.href = "/login";
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Utloggning misslyckades:", error);
     }
   };
 
-  // const handleLogout = async () => {
-  //   const token = localStorage.getItem("token");
-  //   if (!token) {
-  //     console.log("No token was found");
-  //     return;
-  //   }
-  //   try {
-  //     const response = await logoutUser(token);
-  //     console.log("Logout successful:", response);
-  //     localStorage.removeItem("token");
-  //     window.location.href = "/login";
-  //   } catch (error) {
-  //     console.error("Logout failed:", error);
-  //   }
-  // };
 
   return (
     <Box display="flex" justifyContent="space-between" pt={8} mb={6}>
       {token &&
       <Link to="/">
-        <Button>My Books</Button>
+        <Button>Mina sidor</Button>
       </Link>}
       <Box>
         {!token &&
         <>
           <Link to="/login">
-            <Button mr={2}>Login</Button>
+            <Button mr={2}>Logga in</Button>
           </Link>
           <Link to="/register">
-            <Button>Register</Button>
+            <Button>Registrera</Button>
           </Link>
         </>}
         {token &&
-        <Button ml={4} onClick={handleLogout}>Logout</Button>}
+        <Button ml={4} onClick={handleLogout}>Logga ut</Button>}
       </Box>
     </Box>
   );

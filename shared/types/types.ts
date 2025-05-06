@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const currentYear = new Date().getFullYear();
+
 export const BookInfoSchema = z.object({
   isbn: z.string(),
   image_url: z.string(),
@@ -22,27 +24,32 @@ export type BookInfo = z.infer<typeof BookInfoSchema>;
 
 export const IsbnSchema = z
   .string()
-  .nonempty({ message: "ISBN is required" })
-  .regex(/^\d+$/, { message: "ISBN must contain only digits" })
-  .max(13, { message: "ISBN must be at most 13 digits" });
+  .nonempty({ message: "ISBN krävs" })
+  .regex(/^\d+$/, { message: "ISBN måste endast innehålla siffror" })
+  .max(13, { message: "ISBN får vara högst 13 siffror" });
 
 export type Isbn = z.infer<typeof IsbnSchema>;
 
 export const BookFeedbackSchema = z.object({
   month_of_reading: z
     .enum([
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+       "Januari", "Februari", "Mars", "April", "Maj", "Juni",
+      "Juli", "Augusti", "September", "Oktober", "November", "December"
     ]).nullable()
     .optional(),
-  year_of_reading: z.number().min(1000).max(9999, { message: 'Invalid year' }).nullable().optional(),
+  year_of_reading: z
+  .number()
+  .min(1930, { message: 'Ogiltigt år' })
+  .max(currentYear, { message: 'Ogiltigt år' })
+  .nullable()
+  .optional(),
   rating: z
     .number()
     .min(1)
-    .max(5, "The rating can be between 1 and 5 stars.")
+    .max(5, "Betyget kan vara mellan 1 och 5 stjärnor.")
     .nullable()
     .optional(),
-  comment: z.string().max(1000, "Comment can be max 1000 characters long.").nullable().optional(),
+  comment: z.string().max(1000, "Kommentaren kan vara maximalt 1000 tecken lång.").nullable().optional(),
 }).strict();;
 
 export type BookFeedback = z.infer<typeof BookFeedbackSchema>;
@@ -63,13 +70,13 @@ export type UserAndBookRow = z.infer<typeof UserAndBookRowSchema>;
 
 export const UserRegistrationSchema = z
   .object({
-    email: z.string().email({ message: "Invalid email format" }),
-    username: z.string().min(3, { message: "Username must be at least 3 characters" }),
-    password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-    confirm_password: z.string().min(6, { message: "Confirm password must be at least 6 characters" }),
+    email: z.string().email({ message: "Ogiltigt e-postformat" }),
+    username: z.string().min(3, { message: "Användarnamn måste vara minst 3 tecken långt" }),
+    password: z.string().min(6, { message: "Lösenord måste vara minst 6 tecken långt" }),
+    confirm_password: z.string().min(6, { message: "Bekräfta lösenord måste vara minst 6 tecken långt" }),
   })
   .refine((data) => data.password === data.confirm_password, {
-    message: "Passwords do not match",
+    message: "Lösenorden matchar inte",
     path: ["confirm_password"],
   });
 
