@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import MyBooks from './MyBooks'
 import { HStack, Button, Text, Dialog, CloseButton, Portal, Input, Box } from '@chakra-ui/react'
 import { BellAlertIcon, PlusIcon } from '@heroicons/react/24/outline'
@@ -12,7 +12,8 @@ const MainPage = () => {
     const [bookUpdateKey, setBookUpdateKey] = useState(0);
     const [opened, setOpened] = useState<boolean>(false); 
     const [clicked, setClicked] = useState<boolean>(false);
-    const [showInfo, setShowInfo] = useState(true);
+    const [showInfo, setShowInfo] = useState(false);
+    const controllerRef = useRef<AbortController | null>(null);
 
     const navigate = useNavigate();
 
@@ -30,22 +31,30 @@ const MainPage = () => {
         setClicked(false)
         return;
       }
-      
+      const controller = new AbortController();
+      controllerRef.current = controller;
+
       try {
-          await getBooks(value);
+          await getBooks(value, controller.signal);
           setBookUpdateKey(prev => prev + 1); 
           setError(null);
           setOpened(false);
-      } catch (err: unknown) {
-          if (err instanceof Error) {
-              setError(err.message ? err.message : "Kunde inte få information om boken");
-            } else {
-              setError("Ett okänt fel inträffade");
-            }
+      } catch (err: any) {
+        if (err.name === "AbortError") {
+          console.log("Fetch aborted");
+          return;
+        }
+        setError(err.message || "Kunde inte få information om boken");
       } finally {
         setClicked(false);
+        controllerRef.current = null;
       }
     }
+
+    const handleDialogClose = () => {
+      setOpened(false);
+      controllerRef.current?.abort();
+    };
 
   return (
     <>
@@ -71,7 +80,7 @@ const MainPage = () => {
               <Button variant="outline" loading={clicked} loadingText="Sparar..." onClick={onSave}>Spara</Button>
           </Dialog.Footer>
           <Dialog.CloseTrigger asChild>
-            <CloseButton size="sm" onClick={() => setOpened(false)} />
+            <CloseButton size="sm" onClick={handleDialogClose} />
           </Dialog.CloseTrigger>
         </Dialog.Content>
       </Dialog.Positioner>

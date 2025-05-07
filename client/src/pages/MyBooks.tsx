@@ -2,7 +2,7 @@ import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Textarea, Dial
 import React, { useEffect, useState } from 'react'
 import { deleteUserBook, getUserBooks, patchUserBook } from '../api/user'
 import { BookFeedbackSchema, UserAndBookRow } from '../../../shared/types/types'
-import { TrashIcon, PencilIcon, BellAlertIcon } from '@heroicons/react/24/outline'
+import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
 import default_book from '../assets/default_book.jpg'
 import { z } from 'zod'
 import { AnimatePresence, motion } from 'framer-motion';
