@@ -52,7 +52,10 @@ export const patchBookFeedbackController = async (req: AuthRequest, res: Respons
     await patchBookFeedbackByUserBookId(Number(userBookId), data);
 
     res.status(200).json({ message: "Feedback updated successfully" });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (!(error instanceof Error)) {
+      return;
+    }
     logger.error(error);
     res.status(500).json({ message: error.message || "Could not update feedback" });
   }
@@ -75,7 +78,10 @@ export const deleteUserBookController = async (req: AuthRequest, res: Response):
     } else {
       res.status(404).json({ message: "Book not found or does not belong to the user" });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (!(error instanceof Error)) {
+      return;
+    }
     logger.error("Error deleting user book", error);
     res.status(500).json({ message: "Failed to delete book", error: error.message });
   }
@@ -100,7 +106,10 @@ export const registerUserController = async (req: Request, res: Response): Promi
       token,
       user,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (!(error instanceof Error)) {
+      return;
+    }
     logger.error(error);
     res.status(400).json({ message: error.message || 'Registration failed' });
   }
@@ -125,7 +134,10 @@ export const loginUserController = async (req: Request, res: Response): Promise<
       message: "Login successful",
       ...result,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (!(error instanceof Error)) {
+      return;
+    }
     logger.error(error);
     res.status(401).json({
       message: error.message || "Login failed",
@@ -145,7 +157,10 @@ export const logoutUserController = async (req: Request, res: Response): Promise
     await logoutUser(token);
 
     res.status(200).json({ message: "Logged out successfully" });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (!(error instanceof Error)) {
+      return;
+    }
     res.status(500).json({ message: "Logout failed", error });
   }
 };

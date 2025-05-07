@@ -27,12 +27,14 @@ export const fetchBookMetadataOnly = async (isbn: string): Promise<string> => {
     });
 
     if (response.status === 200 && response.data.items && response.data.items?.length > 0) {
-      // const bookInfo = await parseBookInfo(response.data.items[0], isbn);
       return isbn;
     } else {
       throw new Error("No book found for the given ISBN");
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (!(error instanceof Error)) {
+      return '';
+    }
     logger.error("API request failed:", error.message);
     throw new Error("API request failed: " + error.message);
   }
@@ -41,8 +43,6 @@ export const fetchBookMetadataOnly = async (isbn: string): Promise<string> => {
 
 
 export const fetchBookInfoByISBN = async (isbn: string, userId: string): Promise<BookInfo> => {
-  // isbn = isbn.replace(/[^0-9]/g, "");
-  // isbn = isbn.trim();
 
   const url = `https://libris-qa.kb.se/find?q=isbn:${isbn}&@type=Instance`;
 
@@ -64,8 +64,8 @@ export const fetchBookInfoByISBN = async (isbn: string, userId: string): Promise
     } else {
       throw new Error("No book found for the given ISBN");
     }
-  } catch (error: any) {
-    logger.error("API request failed:", error.message);
+  } catch (error: unknown) {
+    logger.error("API request failed:", error instanceof Error && error.message);
     throw new Error("API request failed: " + error.message);
   }
 };
@@ -184,6 +184,7 @@ const fetchValidImage = async (isbn: string): Promise<string> => {
           `Skipping ${img_db}: Invalid content type (${contentType}).`
         );
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       logger.error(`Error fetching image from ${img_db}:`, error.message);
       if (error.response) logger.error("Response Data:", error.response.data);
@@ -238,6 +239,6 @@ const saveBookToDatabase = async (book: BookInfo, userId: string): Promise<void>
         }).execute();
     });
   } catch (error) {
-    throw new Error("Error saving book.");
+    throw new Error("Error saving book: " + error);
   }
 };

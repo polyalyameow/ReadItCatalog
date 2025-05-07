@@ -1,10 +1,10 @@
-import axiosInstance from "./axiosInstance";
+import api from "./axiosInstance";
 import { UserRegistration, UserLogin } from "../../../shared/types/types";
 import { z } from "zod";
 
 export const registerUser = async (data: UserRegistration) => {
   try {
-    const response = await axiosInstance.post("/auth/register", data);
+    const response = await api.post("/auth/register", data);
     return response.data;
   } catch (error: unknown) {
         if (error instanceof z.ZodError) {
@@ -18,7 +18,7 @@ export const registerUser = async (data: UserRegistration) => {
 
 export const loginUser = async (data: UserLogin) => {
   try {
-    const response = await axiosInstance.post("/auth/login", data);
+    const response = await api.post("/auth/login", data);
     return response.data;
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
@@ -31,7 +31,7 @@ export const loginUser = async (data: UserLogin) => {
 
 export const logoutUser = async (token: string) => {
   try {
-    const response = await axiosInstance.post("/auth/logout", { token });
+    const response = await api.post("/auth/logout", { token });
     return response.data;
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
@@ -48,7 +48,7 @@ export const isAuthenticated = async () => {
   if (!token) return false;
 
   try {
-    const response = await axiosInstance.get("/auth/verify");
+    const response = await api.get("/auth/verify");
     return response.status === 200;
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {

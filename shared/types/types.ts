@@ -64,6 +64,7 @@ export const UserIdSchema = z.object({
 
 export type UserId = z.infer<typeof UserIdSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const UserAndBookRowSchema = BookRowSchema.merge(UserIdSchema);
 
 export type UserAndBookRow = z.infer<typeof UserAndBookRowSchema>;

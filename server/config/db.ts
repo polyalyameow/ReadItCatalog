@@ -22,8 +22,8 @@ const pool = mysql.createPool({
     const connection = await pool.getConnection();
     logger.debug("Successfully connected to the database!");
     connection.release();
-  } catch (error: any) {
-    logger.error("Database connection failed:", error.message);
+  } catch (error: unknown) {
+    logger.error("Database connection failed:", error instanceof Error && error.message);
   }
 })();
 

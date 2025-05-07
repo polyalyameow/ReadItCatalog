@@ -21,7 +21,7 @@ const Navbar = () => {
 
   return (
     <Box display="flex" justifyContent="space-between" pt={8} mb={6}>
-      {token &&
+      {token && 
       <Link to="/">
         <Button>Mina sidor</Button>
       </Link>}

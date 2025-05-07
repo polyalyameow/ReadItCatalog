@@ -16,7 +16,6 @@ export const getBookInfoByISBNController = async (
   let aborted = false;
 
   req.on("aborted", () => {
-    console.log("Client aborted the request");
     aborted = true;
   });
 
@@ -31,7 +30,10 @@ export const getBookInfoByISBNController = async (
       return res.status(404).json({ error: "Book not found" });
     }
     return res.json(bookInfo);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (!(error instanceof Error)) {
+      return;
+    }
     console.error("Error fetching book info:", error);
     return res.status(500).json({ error: error.message ?? "Error fetching book information" });
   }

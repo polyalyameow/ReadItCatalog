@@ -1,5 +1,5 @@
 import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Textarea, Dialog, Portal, CloseButton } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { deleteUserBook, getUserBooks, patchUserBook } from '../api/user'
 import { BookFeedbackSchema, UserAndBookRow } from '../../../shared/types/types'
 import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
@@ -16,7 +16,6 @@ const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: numb
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
   const [openedBookId, setOpenedBookId] = useState<string | null>(null);
-  // const [showInfo, setShowInfo] = useState(true);
 
 
    useEffect(() => {
@@ -57,7 +56,7 @@ const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: numb
     } else if (Array.isArray(tags)) {
       tagArray = tags;
     } else {
-      return '🤷‍♀️ Inga taggar';
+      return error ?? '🤷‍♀️ Inga taggar';
     }
 
     const filtered = [...new Set (tagArray.filter(tag => tag && tag !== 'Unknown'))];
@@ -71,6 +70,14 @@ const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: numb
     else {
       return '⭐'.repeat(rating);
     }
+  }
+
+  const convertGenre = (genre: string) => {
+    
+    if (genre !== "Ej skönlitteratur") {
+      return "Skönlitteratur"
+    }
+    return "Ej skönlitteratur"
   }
 
   const deleteBook = async (id: string) => {
@@ -89,7 +96,7 @@ const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: numb
 
 
 
-  const handleEditChange = (id: string, field: string, value: any) => {
+  const handleEditChange = (id: string, field: string, value: unknown) => {
     setEditingValues(prev => ({
       ...prev,
       [id]: { ...prev[id], [field]: value }
@@ -198,7 +205,7 @@ const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: numb
         maxWidth="300px">{item.language}</Table.Cell>
       <Table.Cell  width="1px"
         whiteSpace="normal"
-        maxWidth="300px">{item.genre}</Table.Cell>
+        maxWidth="300px">{item.genre ? convertGenre(item.genre) : "Okänt genre"}</Table.Cell>
       <Table.Cell width="160px"
         whiteSpace="normal"
         maxWidth="300px">

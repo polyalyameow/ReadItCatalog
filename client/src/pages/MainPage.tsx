@@ -50,12 +50,12 @@ const MainPage = () => {
           setError(null);
           setOpened(false);
         };
-      } catch (err: any) {
-        if (err.name === "AbortError") {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === "AbortError") {
           console.log("Fetch aborted");
           return;
         }
-        setError(err.message || "Kunde inte få information om boken");
+        setError(err instanceof Error && err.message || "Kunde inte få information om boken");
       } finally {
         setClicked(false);
         controllerRef.current = null;
