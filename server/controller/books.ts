@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { fetchBookInfoByISBN } from "../service/books.js";
+import { Response } from "express";
+import { fetchBookInfoByISBN, fetchBookMetadataOnly } from "../service/books.js";
 import { AuthRequest } from "../middleware/verifyJwt.js";
 
 export const getBookInfoByISBNController = async (
@@ -13,8 +13,20 @@ export const getBookInfoByISBNController = async (
     return res.status(401).json({ error: "User not authenticated" });
   }
 
+  let aborted = false;
+
+  req.on("aborted", () => {
+    console.log("Client aborted the request");
+    aborted = true;
+  });
+
   try {
-    const bookInfo = await fetchBookInfoByISBN(isbn, userId);
+    const metadata = await fetchBookMetadataOnly(isbn);
+    if (aborted) {
+      console.error("Aborted request, skipping response and DB save");
+      return;
+    }
+    const bookInfo = await fetchBookInfoByISBN(metadata, userId);
     if (!bookInfo) {
       return res.status(404).json({ error: "Book not found" });
     }

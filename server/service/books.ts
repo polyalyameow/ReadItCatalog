@@ -17,10 +17,32 @@ interface LibrisBookResponse {
   };
 }
 
+export const fetchBookMetadataOnly = async (isbn: string): Promise<string> => {
+  isbn = isbn.replace(/[^0-9]/g, "").trim();
+  const url = `https://libris-qa.kb.se/find?q=isbn:${isbn}&@type=Instance`;
+
+  try {
+    const response = await axios.get<{ items?: LibrisBookResponse[] }>(url, {
+      headers: { Accept: "application/ld+json" },
+    });
+
+    if (response.status === 200 && response.data.items && response.data.items?.length > 0) {
+      // const bookInfo = await parseBookInfo(response.data.items[0], isbn);
+      return isbn;
+    } else {
+      throw new Error("No book found for the given ISBN");
+    }
+  } catch (error: any) {
+    logger.error("API request failed:", error.message);
+    throw new Error("API request failed: " + error.message);
+  }
+};
+
+
 
 export const fetchBookInfoByISBN = async (isbn: string, userId: string): Promise<BookInfo> => {
-  isbn = isbn.replace(/[^0-9]/g, "");
-  isbn = isbn.trim();
+  // isbn = isbn.replace(/[^0-9]/g, "");
+  // isbn = isbn.trim();
 
   const url = `https://libris-qa.kb.se/find?q=isbn:${isbn}&@type=Instance`;
 

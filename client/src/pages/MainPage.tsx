@@ -3,7 +3,7 @@ import MyBooks from './MyBooks'
 import { HStack, Button, Text, Dialog, CloseButton, Portal, Input, Box } from '@chakra-ui/react'
 import { BellAlertIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { getBooks } from '../api/books'
-import { IsbnSchema } from '../../../shared/types/types'
+import { IsbnSchema, BookInfo } from '../../../shared/types/types'
 import { useNavigate } from 'react-router-dom'
 
 const MainPage = () => {
@@ -14,6 +14,7 @@ const MainPage = () => {
     const [clicked, setClicked] = useState<boolean>(false);
     const [showInfo, setShowInfo] = useState(false);
     const controllerRef = useRef<AbortController | null>(null);
+    const [books, setBooks] = useState<BookInfo[]>([]);
 
     const navigate = useNavigate();
 
@@ -31,14 +32,24 @@ const MainPage = () => {
         setClicked(false)
         return;
       }
+
+      if (books.some(book => book.isbn === value)) {
+        setError("Den här boken finns redan i din lista.");
+        setClicked(false);
+        return;
+      }
+
       const controller = new AbortController();
       controllerRef.current = controller;
 
       try {
-          await getBooks(value, controller.signal);
+        const fetchedBook = await getBooks(value, controller.signal);
+        if (!controller.signal.aborted) {
+          setBooks(prev => [...prev, fetchedBook]);
           setBookUpdateKey(prev => prev + 1); 
           setError(null);
           setOpened(false);
+        };
       } catch (err: any) {
         if (err.name === "AbortError") {
           console.log("Fetch aborted");
@@ -52,10 +63,11 @@ const MainPage = () => {
     }
 
     const handleDialogClose = () => {
-      setOpened(false);
       controllerRef.current?.abort();
+      controllerRef.current = null;
+      setOpened(false);
     };
-
+    
   return (
     <>
     <HStack>

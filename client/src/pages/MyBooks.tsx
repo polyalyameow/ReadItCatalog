@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { AnimatePresence, motion } from 'framer-motion';
 
 const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: number, showInfo: boolean, setShowInfo: Dispatch<SetStateAction<boolean>> }) => {
-  const MotionBox = motion(Box);
+  const MotionBox = motion.create(Box);
   const [userBooks, setUserBooks] = useState<UserAndBookRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
