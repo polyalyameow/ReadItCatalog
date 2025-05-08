@@ -6,7 +6,8 @@ export const BookInfoSchema = z.object({
   isbn: z.string(),
   image_url: z.string(),
   title: z.string(),
-  year: z.preprocess((val) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  year: z.preprocess((val: any) => {
     if (typeof val === "string") {
       const parsed = parseInt(val, 10);
       return isNaN(parsed) ? undefined : parsed;
@@ -76,7 +77,8 @@ export const UserRegistrationSchema = z
     password: z.string().min(6, { message: "Lösenord måste vara minst 6 tecken långt" }),
     confirm_password: z.string().min(6, { message: "Bekräfta lösenord måste vara minst 6 tecken långt" }),
   })
-  .refine((data) => data.password === data.confirm_password, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .refine((data: any) => data.password === data.confirm_password, {
     message: "Lösenorden matchar inte",
     path: ["confirm_password"],
   });

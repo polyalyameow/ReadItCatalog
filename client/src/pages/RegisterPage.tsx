@@ -35,7 +35,8 @@ const RegisterPage = () => {
     } catch (err) {
       if (err instanceof ZodError) {
         const errors: Record<string, string> = {};
-        err.errors.forEach((e) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        err.errors.forEach((e: any) => {
           if (e.path.length > 0) {
             errors[e.path[0] as string] = e.message;
           }

@@ -8,7 +8,7 @@ import {
     SimpleGrid,
 } from "@chakra-ui/react";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getMonthlyStats } from "../../api/stats";
 
 const MonthlyStats = () => {

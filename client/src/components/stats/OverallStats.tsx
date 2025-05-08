@@ -1,6 +1,6 @@
 import { Box, SimpleGrid, Card, CardHeader, CardBody, Stat, StatHelpText, Text, Spinner } from '@chakra-ui/react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getGeneralStats } from '../../api/stats';
 
 interface GeneralStats {

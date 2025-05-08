@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getYearlyStats } from '../../api/stats';
 import { Box, SimpleGrid, Card, CardHeader, Text, Spinner } from '@chakra-ui/react';
 

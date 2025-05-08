@@ -110,9 +110,9 @@ const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: numb
 
       try {
         BookFeedbackSchema.parse(data);
-      } catch (error) {
+      } catch (error: any) {
         if (error instanceof z.ZodError) {
-          const errorMessages = error.issues.map((issue) => issue.message).join("\n");
+          const errorMessages = error.issues.map((issue: z.ZodIssue) => issue.message).join("\n");
           alert("Validering har inte gått igenom:\n" + errorMessages);
           return;
         }

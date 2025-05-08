@@ -13,7 +13,7 @@
   },
   "include": [
     "server/**/*",
-    "shared/types/**/*"
-, "shared/logger.ts"  ],
+    "client/**/*",
+    "shared/**/*"],
   "exclude": ["node_modules"]
 }
