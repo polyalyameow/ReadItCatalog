@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Box, Field, Input, Button } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { UserRegistration, UserRegistrationSchema } from '../../../shared/types/types';
@@ -32,10 +33,9 @@ const RegisterPage = () => {
       localStorage.setItem("token", response.token);
       register(response.token);
       navigate("/");
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof ZodError) {
         const errors: Record<string, string> = {};
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         err.errors.forEach((e: any) => {
           if (e.path.length > 0) {
             errors[e.path[0] as string] = e.message;
