@@ -12,7 +12,7 @@ export const BookInfoSchema = z.object({
       const parsed = parseInt(val, 10);
       return isNaN(parsed) ? undefined : parsed;
     }
-    return val;
+    return val;  
   }, z.number().optional()),
   page_count: z.number().optional(),
   language: z.string().optional(),
