@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from "./axiosInstance";
 import { UserRegistration, UserLogin } from "../../../shared/types/types";
 import { z } from "zod";
@@ -6,7 +7,7 @@ export const registerUser = async (data: UserRegistration) => {
   try {
     const response = await api.post("/auth/register", data);
     return response.data;
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       throw new Error(error.message);
     } else {
@@ -20,7 +21,7 @@ export const loginUser = async (data: UserLogin) => {
   try {
     const response = await api.post("/auth/login", data);
     return response.data;
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       throw new Error(error.message);
     } else {
@@ -33,7 +34,7 @@ export const logoutUser = async (token: string) => {
   try {
     const response = await api.post("/auth/logout", { token });
     return response.data;
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       throw new Error(error.message);
     } else {
@@ -50,7 +51,7 @@ export const isAuthenticated = async () => {
   try {
     const response = await api.get("/auth/verify");
     return response.status === 200;
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       throw new Error(error.message);
     } else {

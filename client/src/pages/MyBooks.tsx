@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Textarea, Dialog, Portal, CloseButton } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { deleteUserBook, getUserBooks, patchUserBook } from '../api/user'
@@ -47,7 +48,7 @@ const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: numb
         if (Array.isArray(parsed)) {
           tagArray = parsed;
         }
-      } catch (error: unknown) {
+      } catch (error: any) {
         if (error instanceof Error) {
           setError(error.message || "Ogiltigt taggformat");
         } else {
@@ -85,7 +86,7 @@ const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: numb
       await deleteUserBook(id)
       setUserBooks(prevBooks => prevBooks.filter(book => book.user_book_id !== id));
       setOpenedBookId(null);
-    } catch (error: unknown) {
+    } catch (error: any) {
       if (error instanceof Error) {
         setError(error.message || "Misslyckades med att ta bort boken");
       } else {
@@ -96,7 +97,7 @@ const MyBooks = ({ bookUpdateKey, showInfo, setShowInfo }: { bookUpdateKey: numb
 
 
 
-  const handleEditChange = (id: string, field: string, value: unknown) => {
+  const handleEditChange = (id: string, field: string, value: any) => {
     setEditingValues(prev => ({
       ...prev,
       [id]: { ...prev[id], [field]: value }

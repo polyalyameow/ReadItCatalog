@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { UserLogin } from "../../../shared/types/types";
 import { loginUser } from "../api/auth";
@@ -26,7 +27,7 @@ const LoginPage = () => {
       localStorage.setItem("token", response.token);
       login(response.token);
       navigate("/");
-    } catch (error: unknown) {
+    } catch (error: any) {
       if (error instanceof Error) {
         setError(error.message || "Login failed");
       } else {

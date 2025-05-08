@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useRef } from 'react'
 import MyBooks from './MyBooks'
 import { HStack, Button, Text, Dialog, CloseButton, Portal, Input, Box } from '@chakra-ui/react'
@@ -50,7 +51,7 @@ const MainPage = () => {
         setError(null);
         setOpened(false);
       };
-    } catch (err: unknown) {
+    } catch (err: any) {
       if (err instanceof Error && err.name === "AbortError") {
         console.log("Fetch aborted");
         return;

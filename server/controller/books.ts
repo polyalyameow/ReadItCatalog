@@ -34,7 +34,8 @@ export const getBookInfoByISBNController = async (
     }
     return res.json(bookInfo);
 
-  } catch (error: unknown) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     if (!(error instanceof Error)) {
       return;
     }

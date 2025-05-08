@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
@@ -22,7 +23,7 @@ const pool = mysql.createPool({
     const connection = await pool.getConnection();
     logger.debug("Successfully connected to the database!");
     connection.release();
-  } catch (error: unknown) {
+  } catch (error: any) {
     logger.error("Database connection failed:", error instanceof Error && error.message);
   }
 })();

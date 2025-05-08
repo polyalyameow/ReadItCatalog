@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import { deleteUserBook, getUserSavedBooks, loginUser, logoutUser, patchBookFeedbackByUserBookId, registerUser } from "../service/user";
 import { UserLoginSchema, UserRegistrationSchema, UserLogin, UserRegistration, BookFeedbackSchema } from "../../shared/types/types";
@@ -52,7 +53,7 @@ export const patchBookFeedbackController = async (req: AuthRequest, res: Respons
     await patchBookFeedbackByUserBookId(Number(userBookId), data);
 
     res.status(200).json({ message: "Feedback updated successfully" });
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (!(error instanceof Error)) {
       return;
     }
@@ -78,7 +79,7 @@ export const deleteUserBookController = async (req: AuthRequest, res: Response):
     } else {
       res.status(404).json({ message: "Book not found or does not belong to the user" });
     }
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (!(error instanceof Error)) {
       return;
     }
@@ -106,7 +107,7 @@ export const registerUserController = async (req: Request, res: Response): Promi
       token,
       user,
     });
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (!(error instanceof Error)) {
       return;
     }
@@ -134,7 +135,7 @@ export const loginUserController = async (req: Request, res: Response): Promise<
       message: "Login successful",
       ...result,
     });
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (!(error instanceof Error)) {
       return;
     }
@@ -157,7 +158,7 @@ export const logoutUserController = async (req: Request, res: Response): Promise
     await logoutUser(token);
 
     res.status(200).json({ message: "Logged out successfully" });
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (!(error instanceof Error)) {
       return;
     }

@@ -32,7 +32,8 @@ export const fetchBookMetadataOnly = async (isbn: string, signal: AbortSignal): 
     } else {
       throw new Error("No book found for the given ISBN");
     }
-  } catch (error: unknown) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     if (!(error instanceof Error)) {
       return '';
     }

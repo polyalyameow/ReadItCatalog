@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from "zod";
 import axiosInstance from "./axiosInstance";
 import { UserAndBookRow } from "../../../shared/types/types";
@@ -6,7 +7,7 @@ export const getUserBooks = async () => {
   try {
     const response = await axiosInstance.get("/user/my-books");
     return response.data;
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       throw new Error(error.message);
     } else {
@@ -19,7 +20,7 @@ export const deleteUserBook = async (id: string) => {
   try {
     const response = await axiosInstance.delete(`/user/my-books/${id}`)
     return response.data;
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       throw new Error(error.message);
     } else {
@@ -32,7 +33,7 @@ export const patchUserBook = async (id: string, data: Partial<UserAndBookRow>) =
   try {
     const response = await axiosInstance.patch(`/user/my-books/${id}/feedback`, data)
     return response.data;
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       throw new Error(error.message);
     } else {
