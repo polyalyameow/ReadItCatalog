@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { UserLogin } from "../../../shared/types/types";
-import { loginUser } from "../api/auth"; 
+import { loginUser } from "../api/auth";
 import { Input, Button, Box, Field } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";

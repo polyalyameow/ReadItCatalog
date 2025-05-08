@@ -3,7 +3,7 @@ import { BookInfo, BookInfoSchema } from "../../shared/types/types"
 import { db } from "../config/db";
 import { eq } from "drizzle-orm";
 import { books, userBookFeedback, userBooks } from "../db/schema"
-import logger from "../logger";
+import logger from "../../shared/logger";
 
 interface LibrisBookResponse {
   hasTitle?: { mainTitle: string }[];
@@ -17,13 +17,14 @@ interface LibrisBookResponse {
   };
 }
 
-export const fetchBookMetadataOnly = async (isbn: string): Promise<string> => {
+export const fetchBookMetadataOnly = async (isbn: string, signal: AbortSignal): Promise<string> => {
   isbn = isbn.replace(/[^0-9]/g, "").trim();
   const url = `https://libris-qa.kb.se/find?q=isbn:${isbn}&@type=Instance`;
 
   try {
     const response = await axios.get<{ items?: LibrisBookResponse[] }>(url, {
       headers: { Accept: "application/ld+json" },
+      signal,
     });
 
     if (response.status === 200 && response.data.items && response.data.items?.length > 0) {
@@ -42,13 +43,14 @@ export const fetchBookMetadataOnly = async (isbn: string): Promise<string> => {
 
 
 
-export const fetchBookInfoByISBN = async (isbn: string, userId: string): Promise<BookInfo> => {
+export const fetchBookInfoByISBN = async (isbn: string, userId: string, signal: AbortSignal): Promise<BookInfo> => {
 
   const url = `https://libris-qa.kb.se/find?q=isbn:${isbn}&@type=Instance`;
 
   try {
     const response = await axios.get<{ items?: LibrisBookResponse[] }>(url, {
       headers: { Accept: "application/ld+json" },
+      signal,
     });
     if (
       response.status === 200 &&
@@ -64,8 +66,9 @@ export const fetchBookInfoByISBN = async (isbn: string, userId: string): Promise
     } else {
       throw new Error("No book found for the given ISBN");
     }
-  } catch (error: unknown) {
-    logger.error("API request failed:", error instanceof Error && error.message);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    logger.error("API request failed:", error.message);
     throw new Error("API request failed: " + error.message);
   }
 };
@@ -105,9 +108,6 @@ const parseBookInfo = async (
     tags: extractTags(data.instanceOf?.subject),
   };
 
-  console.log('LANGUAGE', data.instanceOf?.language?.[0]?.code)
-  console.log('LANGUAGE', data.instanceOf?.language);
-  console.log(bookInfo);
   return BookInfoSchema.parse(bookInfo);
 };
 
@@ -184,7 +184,7 @@ const fetchValidImage = async (isbn: string): Promise<string> => {
           `Skipping ${img_db}: Invalid content type (${contentType}).`
         );
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       logger.error(`Error fetching image from ${img_db}:`, error.message);
       if (error.response) logger.error("Response Data:", error.response.data);

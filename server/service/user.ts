@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { BookFeedback, UserLogin, UserRegistration } from "../../shared/types/types";
 
 export const getUserSavedBooks = async (userId: string) => {
-  
+
   const result = await db.select({
     user_book_id: userBooks.id,
     isbn: books.isbn,
@@ -30,7 +30,6 @@ export const getUserSavedBooks = async (userId: string) => {
     .where(eq(userBooks.user_id, userId))
     .execute();
 
-  //console.log('[RESULT OF ADDING BOOK]', result)
   return result;
 };
 

@@ -21,22 +21,22 @@ const Navbar = () => {
 
   return (
     <Box display="flex" justifyContent="space-between" pt={8} mb={6}>
-      {token && 
-      <Link to="/">
-        <Button>Mina sidor</Button>
-      </Link>}
+      {token &&
+        <Link to="/">
+          <Button>Mina sidor</Button>
+        </Link>}
       <Box>
         {!token &&
-        <>
-          <Link to="/login">
-            <Button mr={2}>Logga in</Button>
-          </Link>
-          <Link to="/register">
-            <Button>Registrera</Button>
-          </Link>
-        </>}
+          <>
+            <Link to="/login">
+              <Button mr={2}>Logga in</Button>
+            </Link>
+            <Link to="/register">
+              <Button>Registrera</Button>
+            </Link>
+          </>}
         {token &&
-        <Button ml={4} onClick={handleLogout}>Logga ut</Button>}
+          <Button ml={4} onClick={handleLogout}>Logga ut</Button>}
       </Box>
     </Box>
   );

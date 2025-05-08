@@ -6,10 +6,10 @@ export const getBooks = async (isbn: string, signal?: AbortSignal) => {
       signal,
     });
     return response.data;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.name === "CanceledError" || error.code === "ERR_CANCELED") {
-      console.log("Request was cancelled");
+      console.debug("Request was cancelled");
       throw new DOMException("Aborted", "AbortError");
     }
 

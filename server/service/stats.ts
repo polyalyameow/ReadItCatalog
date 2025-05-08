@@ -1,5 +1,5 @@
 import { getUserSavedBooks } from "./user";
-import logger from "../logger";
+import logger from "../../shared/logger";
 
 export const getGeneralStats = async (userId: string) => {
   const allBooks = await getUserSavedBooks(userId);
@@ -107,8 +107,8 @@ export const getMontlyStats = async (userId: string) => {
   }
 
   const monthOrder = [
-     "Januari", "Februari", "Mars", "April", "Maj", "Juni",
-      "Juli", "Augusti", "September", "Oktober", "November", "December"
+    "Januari", "Februari", "Mars", "April", "Maj", "Juni",
+    "Juli", "Augusti", "September", "Oktober", "November", "December"
   ];
 
   const orderedStats: typeof monthStats = {};

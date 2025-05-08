@@ -3,16 +3,16 @@ import axiosInstance from "./axiosInstance";
 
 export const getGeneralStats = async () => {
     try {
-      const response = await axiosInstance.get('/stats/general');
-      return response.data;
+        const response = await axiosInstance.get('/stats/general');
+        return response.data;
     } catch (error: unknown) {
-            if (error instanceof z.ZodError) {
-                throw new Error(error.message);
-            } else {
-                throw new Error("Kunde inte hitta statistik för dina böcker.")
-            }
-      }
-  };
+        if (error instanceof z.ZodError) {
+            throw new Error(error.message);
+        } else {
+            throw new Error("Kunde inte hitta statistik för dina böcker.")
+        }
+    }
+};
 
 
 export const getMonthlyStats = async () => {

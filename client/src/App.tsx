@@ -10,19 +10,19 @@ import UnprotectedRoute from './utils/UnprotectedRoute';
 import { Box } from '@chakra-ui/react';
 import MainPage from './pages/MainPage';
 import SessionExpired from './pages/SessionExpired';
-import { SessionWatcher } from './components/SessionWatcher';
+import { SessionWatcher } from './components/utils/SessionWatcher';
 
 
-  const App = (): JSX.Element => {
-    const location = useLocation();
+const App = (): JSX.Element => {
+  const location = useLocation();
 
-    const hideNavbarRoutes = ["/session-expired"];
-    const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
-  
-    return (
-      <Box height="100%" width="100%" display="flex" flexDirection="column" py={4} px={10}>
-        {shouldShowNavbar && <Navbar />}
-        <Box flex="1" overflow="auto">
+  const hideNavbarRoutes = ["/session-expired"];
+  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+
+  return (
+    <Box height="100%" width="100%" display="flex" flexDirection="column" py={4} px={10}>
+      {shouldShowNavbar && <Navbar />}
+      <Box flex="1" overflow="auto">
         <SessionWatcher />
         <Routes>
           <Route path="/register" element={<UnprotectedRoute><RegisterPage /></UnprotectedRoute>} />
@@ -31,9 +31,9 @@ import { SessionWatcher } from './components/SessionWatcher';
           <Route path="/" element={<ProtectedRoute><MainPage /></ProtectedRoute>} />
           <Route path="/stats" element={<ProtectedRoute><StatsPage /></ProtectedRoute>} />
         </Routes>
-        </Box>
       </Box>
-    );
-  };
+    </Box>
+  );
+};
 
 export default App

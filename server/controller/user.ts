@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { deleteUserBook, getUserSavedBooks, loginUser, logoutUser, patchBookFeedbackByUserBookId, registerUser } from "../service/user";
 import { UserLoginSchema, UserRegistrationSchema, UserLogin, UserRegistration, BookFeedbackSchema } from "../../shared/types/types";
-import logger from "../logger";
+import logger from "../../shared/logger";
 import { AuthRequest } from "../middleware/verifyJwt";
 import { db } from "../config/db";
 import { userBookFeedback, userBooks } from "../db/schema";

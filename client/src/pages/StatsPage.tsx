@@ -1,12 +1,12 @@
 import { Box, Button, HStack } from '@chakra-ui/react'
-import React, { useState } from 'react'
-import OverallStats from '../components/OverallStats';
-import MonthlyStats from '../components/MonthlyStats';
-import YearlyStats from '../components/YearlyStats';
+import { useState } from 'react'
+import OverallStats from '../components/stats/OverallStats';
+import MonthlyStats from '../components/stats/MonthlyStats';
+import YearlyStats from '../components/stats/YearlyStats';
 
 const StatsPage = () => {
   const [view, setView] = useState<"overall" | "yearly" | "monthly">("overall");
-  
+
   return (
     <>
       <HStack p={4} mb={4}>

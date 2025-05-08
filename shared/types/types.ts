@@ -33,16 +33,16 @@ export type Isbn = z.infer<typeof IsbnSchema>;
 export const BookFeedbackSchema = z.object({
   month_of_reading: z
     .enum([
-       "Januari", "Februari", "Mars", "April", "Maj", "Juni",
+      "Januari", "Februari", "Mars", "April", "Maj", "Juni",
       "Juli", "Augusti", "September", "Oktober", "November", "December"
     ]).nullable()
     .optional(),
   year_of_reading: z
-  .number()
-  .min(1930, { message: 'Ogiltigt år' })
-  .max(currentYear, { message: 'Ogiltigt år' })
-  .nullable()
-  .optional(),
+    .number()
+    .min(1930, { message: 'Ogiltigt år' })
+    .max(currentYear, { message: 'Ogiltigt år' })
+    .nullable()
+    .optional(),
   rating: z
     .number()
     .min(1)

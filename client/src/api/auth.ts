@@ -7,11 +7,11 @@ export const registerUser = async (data: UserRegistration) => {
     const response = await api.post("/auth/register", data);
     return response.data;
   } catch (error: unknown) {
-        if (error instanceof z.ZodError) {
-            throw new Error(error.message);
-        } else {
-            throw new Error("Registreringen misslyckades")
-        }
+    if (error instanceof z.ZodError) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Registreringen misslyckades")
+    }
   }
 };
 
@@ -22,11 +22,11 @@ export const loginUser = async (data: UserLogin) => {
     return response.data;
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-        throw new Error(error.message);
+      throw new Error(error.message);
     } else {
-        throw new Error("Fel email eller lösenord")
+      throw new Error("Fel email eller lösenord")
     }
-}
+  }
 };
 
 export const logoutUser = async (token: string) => {
@@ -35,11 +35,11 @@ export const logoutUser = async (token: string) => {
     return response.data;
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-        throw new Error(error.message);
+      throw new Error(error.message);
     } else {
-        throw new Error("Utloggning misslyckades")
+      throw new Error("Utloggning misslyckades")
     }
-}
+  }
 };
 
 
@@ -52,9 +52,9 @@ export const isAuthenticated = async () => {
     return response.status === 200;
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-        throw new Error(error.message);
+      throw new Error(error.message);
     } else {
-        return false
+      return false
     }
-}
+  }
 };

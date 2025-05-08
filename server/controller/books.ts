@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { fetchBookInfoByISBN, fetchBookMetadataOnly } from "../service/books.js";
 import { AuthRequest } from "../middleware/verifyJwt.js";
+import logger from "../../shared/logger.js";
 
 export const getBookInfoByISBNController = async (
   req: AuthRequest<{ isbn: string }>,
@@ -13,28 +14,31 @@ export const getBookInfoByISBNController = async (
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  let aborted = false;
+  const controller = new AbortController();
 
   req.on("aborted", () => {
-    aborted = true;
+    controller.abort();
+    logger.warn("Client aborted request — aborting upstream fetches.");
   });
 
   try {
-    const metadata = await fetchBookMetadataOnly(isbn);
-    if (aborted) {
-      console.error("Aborted request, skipping response and DB save");
+    const metadata = await fetchBookMetadataOnly(isbn, controller.signal);
+    if (controller.signal.aborted) {
+      logger.error("Aborted request, skipping response and DB save");
       return;
     }
-    const bookInfo = await fetchBookInfoByISBN(metadata, userId);
+
+    const bookInfo = await fetchBookInfoByISBN(metadata, userId, controller.signal);
     if (!bookInfo) {
       return res.status(404).json({ error: "Book not found" });
     }
     return res.json(bookInfo);
+
   } catch (error: unknown) {
     if (!(error instanceof Error)) {
       return;
     }
-    console.error("Error fetching book info:", error);
+    logger.error("Error fetching book info:", error);
     return res.status(500).json({ error: error.message ?? "Error fetching book information" });
   }
 };

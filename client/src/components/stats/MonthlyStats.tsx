@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 
 import React, { useEffect, useState } from "react";
-import { getMonthlyStats } from "../api/stats";
+import { getMonthlyStats } from "../../api/stats";
 
 const MonthlyStats = () => {
     const [stats, setStats] = useState<Record<string, {
