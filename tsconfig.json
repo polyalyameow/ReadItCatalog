@@ -11,9 +11,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,                         
   },
-  "include": [
-    "server/**/*",
-    "client/**/*",
-    "shared/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["client", "server", "shared"],
+  "exclude": ["node_modules"],
+  "typeRoots": ["./node_modules/@types", "./node_modules"]
 }
