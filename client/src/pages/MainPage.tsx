@@ -53,7 +53,6 @@ const MainPage = () => {
       };
     } catch (err: any) {
       if (err instanceof Error && err.name === "AbortError") {
-        console.log("Fetch aborted");
         return;
       }
       setError(err instanceof Error && err.message || "Kunde inte få information om boken");
