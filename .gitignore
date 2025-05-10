@@ -1,4 +1,5 @@
 .env
 node_modules/
-dist/
-server/dist
+client/dist/
+server/dist/
+.vercel
