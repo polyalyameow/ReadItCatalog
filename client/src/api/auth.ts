@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import api from "./axiosInstance";
-import { UserRegistration, UserLogin } from "../../../shared/types/types";
+import { UserRegistration, UserLogin } from '../types/types';
 import { z } from "zod";
 
 export const registerUser = async (data: UserRegistration) => {

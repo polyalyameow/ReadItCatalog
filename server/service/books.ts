@@ -1,9 +1,9 @@
 import axios from "axios";
-import { BookInfo, BookInfoSchema } from "../../shared/types/types"
+import { BookInfo, BookInfoSchema } from "../utils/types"
 import { db } from "../config/db";
 import { eq } from "drizzle-orm";
 import { books, userBookFeedback, userBooks } from "../db/schema"
-import logger from "../../shared/logger";
+import logger from "../utils/logger";
 
 interface LibrisBookResponse {
   hasTitle?: { mainTitle: string }[];

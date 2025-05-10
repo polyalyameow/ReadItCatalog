@@ -4,7 +4,7 @@ import MyBooks from './MyBooks'
 import { HStack, Button, Text, Dialog, CloseButton, Portal, Input, Box } from '@chakra-ui/react'
 import { BellAlertIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { getBooks } from '../api/books'
-import { IsbnSchema, BookInfo } from '../../../shared/types/types'
+import { IsbnSchema, BookInfo } from '../types/types'
 import { useNavigate } from 'react-router-dom'
 
 const MainPage = () => {

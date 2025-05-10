@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Box, Field, Input, Button } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { UserRegistration, UserRegistrationSchema } from '../../../shared/types/types';
+import { UserRegistration, UserRegistrationSchema } from '../types/types';
 import { registerUser } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../utils/AuthContext';

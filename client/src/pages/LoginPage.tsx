@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import { UserLogin } from "../../../shared/types/types";
+import { UserLogin } from "../types/types";
 import { loginUser } from "../api/auth";
 import { Input, Button, Box, Field } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";

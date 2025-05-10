@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from "zod";
 import axiosInstance from "./axiosInstance";
-import { UserAndBookRow } from "../../../shared/types/types";
+import { UserAndBookRow } from '../types/types';
 
 export const getUserBooks = async () => {
   try {

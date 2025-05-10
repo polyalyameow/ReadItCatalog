@@ -1,5 +1,5 @@
 import { getUserSavedBooks } from "./user";
-import logger from "../../shared/logger";
+import logger from "../utils/logger";
 
 export const getGeneralStats = async (userId: string) => {
   const allBooks = await getUserSavedBooks(userId);

@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { fetchBookInfoByISBN, fetchBookMetadataOnly } from "../service/books.js";
 import { AuthRequest } from "../middleware/verifyJwt.js";
-import logger from "../../shared/logger.js";
+import logger from "../utils/logger";
 
 export const getBookInfoByISBNController = async (
   req: AuthRequest<{ isbn: string }>,

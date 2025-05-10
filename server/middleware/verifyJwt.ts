@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { db } from '../config/db';
 import { jwtBlacklist, users } from '../db/schema';
 import { eq } from "drizzle-orm";
-import logger from '../../shared/logger';
+import logger from '../utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface AuthRequest<P = any> extends Request<P> {

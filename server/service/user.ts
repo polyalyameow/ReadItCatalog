@@ -4,7 +4,7 @@ import { userBooks, books, users, userBookFeedback, jwtBlacklist } from "../db/s
 import bcrypt from 'bcryptjs';
 import { generateJWT } from "../utils/jwtUtils";
 import { v4 as uuidv4 } from 'uuid';
-import { BookFeedback, UserLogin, UserRegistration } from "../../shared/types/types";
+import { BookFeedback, UserLogin, UserRegistration } from "../utils/types";
 
 export const getUserSavedBooks = async (userId: string) => {
 

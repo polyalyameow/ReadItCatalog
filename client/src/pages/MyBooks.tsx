@@ -2,7 +2,7 @@
 import { Table, Spinner, Text, Box, Image, Button, VStack, Input, Textarea, Dialog, Portal, CloseButton } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { deleteUserBook, getUserBooks, patchUserBook } from '../api/user'
-import { BookFeedbackSchema, UserAndBookRow } from '../../../shared/types/types'
+import { BookFeedbackSchema, UserAndBookRow } from '../types/types'
 import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
 import default_book from '../assets/default_book.jpg'
 import { z } from 'zod'
