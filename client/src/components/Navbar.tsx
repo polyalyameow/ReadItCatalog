@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Box, Button } from "@chakra-ui/react";
 import { logoutUser } from "../api/auth";
 import { useAuth } from "../utils/AuthContext";
@@ -6,13 +6,14 @@ import { useAuth } from "../utils/AuthContext";
 const Navbar = () => {
 
   const { token, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     if (!token) return;
     try {
       await logoutUser(token);
       logout();
-      window.location.href = "/login";
+      navigate("/login");
     } catch (error) {
       console.error("Utloggning misslyckades:", error);
     }
