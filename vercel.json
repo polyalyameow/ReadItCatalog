@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "rewrites": [ { "source": "/(.*)", "destination": "/index.html" } ],
   "builds": [
     {
       "src": "server/server.ts",
@@ -19,6 +18,10 @@
     {
       "src": "/(.*)",
       "dest": "/client/$1"
+    },
+    {
+      "src": "/[^.]+",
+      "dest": "/"
     }
   ]
 }
