@@ -5,22 +5,22 @@ import authRoutes from "./routes/authRoutes";
 import user from "./routes/user";
 import stats from "./routes/stats";
 import { verifyToken } from "./middleware/verifyJwt";
-import logger from "./utils/logger";
+// import logger from "./utils/logger";
 import { loginUserController, logoutUserController, registerUserController } from "./controller/user";
 
 const app = express();
 
 const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "https://read-opcs20dmi-polyalyameows-projects.vercel.app",
-  ],
+    origin: process.env.NODE_ENV === "production"
+    ? true
+    : ["http://localhost:5173"],
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: false,
 };
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 
@@ -43,7 +43,9 @@ app.use("/api/books", routes);
 app.use("/api/user", user);
 app.use("/api/stats", stats);
 
-const port = 8080;
-app.listen(port, () => {
-  logger.debug(`Server running at http://localhost:${port}`);
-});
+// const port = 8080;
+// app.listen(port, () => {
+//   logger.debug(`Server running at http://localhost:${port}`);
+// });
+
+export default app;
