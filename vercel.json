@@ -19,6 +19,6 @@
       "src": "/(.*)",
       "dest": "/client/$1"
     },
-    { "src": "/[^.]+", "dest": "/", "status": 200 }
+    { "src": "/login", "dest": "/", "status": 200 }
   ]
 }
