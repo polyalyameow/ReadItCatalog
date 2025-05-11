@@ -11,9 +11,7 @@ import { loginUserController, logoutUserController, registerUserController } fro
 const app = express();
 
 const corsOptions = {
-    origin: process.env.NODE_ENV === "production"
-    ? true
-    : ["http://localhost:5173"],
+  origin: ["https://read-ak96ltt7d-polyalyameows-projects.vercel.app", "http://localhost:5173", "https://read-igp10p8l2-polyalyameows-projects.vercel.app"],
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: false,
