@@ -6,7 +6,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server/dist/server.js",
     "dev": "vite",
-    "dev:server": "ts-node --project server/tsconfig.json server/server.ts",
     "build": "tsc -p server && vite build",
     "lint": "eslint . --config eslint.config.mjs --ext .ts,.tsx"
   },
