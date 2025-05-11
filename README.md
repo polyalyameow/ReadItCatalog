@@ -14,8 +14,8 @@ ReadIt is a minimalist web application that allows users to register physical bo
 - Remove books from your personal library
 
 ## Important !
-> **Local development happens in the `dev` branch**
-> `main` branch contains the production version (**may be unstable**): https://read-it-mu.vercel.app/
+- **Local development happens in the `dev` branch**
+- `main` branch contains the production version (**may be unstable**): https://read-it-mu.vercel.app/
 
 ## Getting started
 
