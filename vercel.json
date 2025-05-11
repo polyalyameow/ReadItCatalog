@@ -16,12 +16,19 @@
       "dest": "server/server.ts"
     },
     {
-      "src": "/(.*)",
-      "dest": "/client/$1"
+      "src": "/proxy/(.*)",
+      "dest": "server/server.ts"
     },
     {
-      "src": "/[^.]+",
-      "dest": "/"
+      "src": "/auth/(.*)",
+      "dest": "server/server.ts"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/index.html"
     }
   ]
 }
