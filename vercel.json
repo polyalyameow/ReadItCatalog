@@ -16,23 +16,13 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "server/server.ts"
-    },
-    {
-      "src": "/proxy/(.*)",
-      "dest": "server/server.ts"
-    },
-    {
-      "src": "/auth/(.*)",
-      "dest": "server/server.ts"
-    },
-    {
-      "handle": "filesystem"
+      "dest": "/server/server.ts"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
-    }
+      "dest": "/client/dist/$1"
+    },
+    { "src": "/[^.]+", "dest": "/", "status": 200 }
   ]
 }
 
