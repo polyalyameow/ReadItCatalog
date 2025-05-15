@@ -22,7 +22,7 @@ ReadIt is a minimalist web application that allows users to register physical bo
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/ReadItCatalog.git
+git clone [https://github.com/polyalyameow/ReadItCatalog](https://github.com/polyalyameow/ReadItCatalog.git)
 cd ReadItCatalog
 git checkout dev
 ```
